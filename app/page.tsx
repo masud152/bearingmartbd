@@ -17,7 +17,7 @@ export default function Home() {
         <nav aria-label="Main navigation">
           <a href="#about">About</a><a href="#products">Products</a><a href="#contact">Contact</a>
         </nav>
-        <a className="nav-call" href="https://wa.me/8801730015018" target="_blank" rel="noreferrer">WhatsApp Now</a>
+        <a className="nav-call" href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">WhatsApp Now</a>
       </header>
 
       <section className="hero" id="home">
@@ -25,7 +25,7 @@ export default function Home() {
           <p className="eyebrow">ALL KINDS OF BEARING IMPORTER &amp; SUPPLIER</p>
           <h1>Quality Bearings.<br /><em>Smooth Solutions.</em></h1>
           <p className="lead">Reliable bearings and machinery solutions for workshops, factories, and industrial operations across Bangladesh.</p>
-          <div className="actions"><a className="button primary" href="https://wa.me/8801730015018" target="_blank" rel="noreferrer">WhatsApp 01730-015018</a><a className="button secondary" href="#products">Explore Products</a></div>
+          <div className="actions"><a className="button primary" href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">WhatsApp 01914-528336</a><a className="button secondary" href="#products">Explore Products</a></div>
         </div>
         <div className="hero-art">
           <div className="ring ring-one">{Array.from({ length: 12 }, (_, index) => <span className="ball" style={{ "--i": index } as CSSProperties} key={index} />)}</div>
@@ -44,7 +44,7 @@ export default function Home() {
 
       <section className="contact" id="contact">
         <div><p className="eyebrow">GET IN TOUCH</p><h2>Let&apos;s keep your<br /><em>machines moving.</em></h2></div>
-        <div className="contact-card"><p className="contact-label">Visit our shop</p><address>Bearing Mart BD<br />10, Modonpal Lane<br />Siddique Machineries Market (2nd Floor)<br />Nawabpur, Dhaka-1100</address><a href="tel:+8801730015018">+880 1730-015018</a><p className="owner">Md. Shahidul Islam · Proprietor</p></div>
+        <div className="contact-card"><p className="contact-label">Visit our shop</p><address>Bearing Mart BD<br />10, Modonpal Lane<br />Siddique Machineries Market (2nd Floor)<br />Nawabpur, Dhaka-1100</address><a href="tel:+8801914528336">+880 1914-528336</a><p className="owner">Md. Shahidul Islam · Proprietor</p></div>
       </section>
       <footer><span>© {new Date().getFullYear()} Bearing Mart BD</span><span>Quality Bearings, Smooth Solutions</span></footer>
     </main>
