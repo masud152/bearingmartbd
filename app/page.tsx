@@ -17,7 +17,7 @@ export default function Home() {
         <nav aria-label="Main navigation">
           <a href="#about">About</a><a href="#products">Products</a><a href="#contact">Contact</a>
         </nav>
-        <a className="nav-call" href="tel:+8801730015018">Call Now</a>
+        <a className="nav-call" href="https://wa.me/8801730015018" target="_blank" rel="noreferrer">WhatsApp Now</a>
       </header>
 
       <section className="hero" id="home">
@@ -25,7 +25,7 @@ export default function Home() {
           <p className="eyebrow">ALL KINDS OF BEARING IMPORTER &amp; SUPPLIER</p>
           <h1>Quality Bearings.<br /><em>Smooth Solutions.</em></h1>
           <p className="lead">Reliable bearings and machinery solutions for workshops, factories, and industrial operations across Bangladesh.</p>
-          <div className="actions"><a className="button primary" href="tel:+8801730015018">Call 01730-015018</a><a className="button secondary" href="#products">Explore Products</a></div>
+          <div className="actions"><a className="button primary" href="https://wa.me/8801730015018" target="_blank" rel="noreferrer">WhatsApp 01730-015018</a><a className="button secondary" href="#products">Explore Products</a></div>
         </div>
         <div className="hero-art">
           <div className="ring ring-one">{Array.from({ length: 12 }, (_, index) => <span className="ball" style={{ "--i": index } as CSSProperties} key={index} />)}</div>
