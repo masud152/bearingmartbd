@@ -3,11 +3,12 @@
 import { FormEvent } from "react";
 
 export default function ContactForm() {
-  function sendToWhatsApp(event: FormEvent<HTMLFormElement>) {
+  function openEmailDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const message = [
-      "Hello Bearing Mart BD, I would like to make an enquiry.",
+      "Hello Bearing Mart BD,",
+      "I would like to make an enquiry.",
       "",
       `Name: ${form.get("name")}`,
       `Phone: ${form.get("phone")}`,
@@ -17,10 +18,11 @@ export default function ContactForm() {
       `Message: ${form.get("message")}`,
     ].join("\n");
 
-    window.open(`https://wa.me/8801914528336?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    const subject = `Bearing enquiry from ${form.get("name")}`;
+    window.location.href = `mailto:contact@bearingmartbd.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
   }
 
-  return <form className="contact-form" onSubmit={sendToWhatsApp}>
+  return <form className="contact-form" onSubmit={openEmailDraft}>
     <p className="contact-label">Send an enquiry</p>
     <div className="form-row">
       <label>Name<input name="name" required placeholder="Your full name" /></label>
@@ -31,7 +33,7 @@ export default function ContactForm() {
       <label>Bearing number / product <span>(optional)</span><input name="product" placeholder="e.g. 6205, UCP 205" /></label>
     </div>
     <label>How can we help?<textarea name="message" required rows={5} placeholder="Tell us the bearing type, quantity, brand, size, or other requirement." /></label>
-    <button className="form-submit" type="submit">Send enquiry on WhatsApp →</button>
-    <p className="form-note">Submitting opens WhatsApp with your enquiry prepared for our team.</p>
+    <button className="form-submit" type="submit">Write an email enquiry →</button>
+    <p className="form-note">Submitting opens your email app with this enquiry prepared for our team.</p>
   </form>;
 }
