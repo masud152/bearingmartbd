@@ -32,8 +32,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="site-utility"><a href="/terms">Terms &amp; Conditions</a></div>
         {children}
+        <footer className="global-footer"><span>© {new Date().getFullYear()} Bearing Mart BD</span><a href="/terms">Terms &amp; Conditions</a><span>Quality Bearings, Smooth Solutions</span></footer>
         <HitCounter />
       </body>
     </html>
