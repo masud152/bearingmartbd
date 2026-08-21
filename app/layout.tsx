@@ -33,7 +33,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <footer className="global-footer"><span>© {new Date().getFullYear()} Bearing Mart BD</span><a href="/terms">Terms &amp; Conditions</a><span>Quality Bearings, Smooth Solutions</span></footer>
+        <footer className="global-footer"><span>© {new Date().getFullYear()} Bearing Mart BD</span><span className="footer-links"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Policy</a></span><span>Quality Bearings, Smooth Solutions</span></footer>
         <HitCounter />
       </body>
     </html>
