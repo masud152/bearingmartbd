@@ -1,0 +1,11 @@
+import { can, requireAdmin } from "../_lib/auth";
+import { listProducts } from "../_lib/data";
+import Link from "next/link";
+
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const user=await requireAdmin("products.view","/admin/products"); const {q=""}=await searchParams; const products=await listProducts(q);
+  return <div className="admin-page"><div className="admin-heading"><div><p className="admin-kicker">CATALOGUE</p><h1>Products</h1><p>Create, review and publish catalogue records.</p></div>{can(user,"products.create")&&<Link className="admin-primary" href="/admin/products/new">Add Product</Link>}</div>
+    <form className="admin-filter"><label htmlFor="product-search">Search products</label><div><input id="product-search" name="q" defaultValue={q} placeholder="Name, bearing number or SKU"/><button>Search</button>{q&&<Link href="/admin/products">Clear</Link>}</div></form>
+    <div className="admin-table-wrap"><table className="admin-table"><caption>{products.length} product{products.length===1?"":"s"}</caption><thead><tr><th>Product</th><th>Category / Brand</th><th>Dimensions</th><th>Availability</th><th>Status</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{products.map(p=><tr key={p.id}><td><strong>{p.name}</strong><small>{p.bearingNumber}{p.sku?` · ${p.sku}`:""}</small></td><td>{p.categoryName}<small>{p.brandName??"Brand not specified"}</small></td><td>{p.boreDiameter!=null&&p.outsideDiameter!=null&&p.width!=null?`${p.boreDiameter} × ${p.outsideDiameter} × ${p.width} mm`:"Not specified"}</td><td>{p.stockStatus.replaceAll("_"," ")}</td><td><span className={`admin-status ${p.status}`}>{p.status}</span></td><td><a href={`/admin/products/${p.id}`}>Edit</a></td></tr>)}</tbody></table>{!products.length&&<p className="admin-empty">No products match this view.</p>}</div>
+  </div>;
+}

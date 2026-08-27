@@ -1,0 +1,9 @@
+.admin-role-editor{margin-top:16px;padding-top:14px;border-top:1px solid var(--admin-border)}
+.admin-role-editor fieldset{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;padding:0;border:0}
+.admin-role-editor label{display:flex;gap:8px;align-items:flex-start;padding:7px;background:#f8fafb}
+.admin-role-editor label small{display:block;color:var(--admin-muted);margin-top:3px}
+.admin-access-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;min-width:330px}
+.admin-access-controls select,.admin-access-controls button{min-height:36px;border:1px solid #bfcbd5;border-radius:4px;background:#fff}
+.admin-access-controls button{padding:0 10px;font-weight:800}
+.admin-access-controls small{grid-column:1/-1;color:var(--admin-blue)}
+@media(max-width:600px){.admin-role-editor fieldset{grid-template-columns:1fr}.admin-access-controls{grid-template-columns:1fr;min-width:230px}}
