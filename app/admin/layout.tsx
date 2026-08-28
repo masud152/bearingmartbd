@@ -3,6 +3,7 @@ import { chatGPTSignOutPath } from "../chatgpt-auth";
 import { can, requireAdmin } from "./_lib/auth";
 import "./admin.css";
 import "./access.css";
+import "./visibility.css";
 
 export const dynamic = "force-dynamic";
 

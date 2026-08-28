@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ballBearingProducts } from "../../../../ball-bearing-products";
-import { getManagedBallBearingProduct } from "../../../../managed-product-data";
+import { getManagedBallBearingProduct, getManagedBallBearingProducts } from "../../../../managed-product-data";
+
+export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://bearingmartbd.com";
 const WHATSAPP = "8801914528336";
@@ -9,10 +10,6 @@ const PHONE = "+8801730015018";
 
 function titleType(type: string) {
   return type.endsWith("s") ? type.slice(0, -1) : type;
-}
-
-export function generateStaticParams() {
-  return ballBearingProducts.map(([number]) => ({ number }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ number: string }> }): Promise<Metadata> {
@@ -39,7 +36,8 @@ export default async function ProductDetail({ params }: { params: Promise<{ numb
   const whatsappMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like a quotation for ${productName} (${dimensions}). Please confirm current price, stock and delivery.`);
   const photoMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like help identifying a bearing. I will send a clear photo of the bearing number and both sides.`);
   const quoteUrl = `/contact?product=${encodeURIComponent(productName)}&bearing=${bearingNumber}`;
-  const related = ballBearingProducts.filter(([itemNumber, itemType]) => itemNumber !== bearingNumber && itemType === type).slice(0, 4);
+  const publishedProducts = await getManagedBallBearingProducts();
+  const related = publishedProducts.filter(([itemNumber, itemType]) => itemNumber !== bearingNumber && itemType === type).slice(0, 4);
   const specs = [
     ["Bearing number", bearingNumber], ["Category", "Ball Bearings"], ["Bearing type", productType], ["Brand", "NSK"],
     ["Bore diameter (d)", `${bore} mm`], ["Outside diameter (D)", `${outer} mm`], ["Width (B)", `${width} mm`],

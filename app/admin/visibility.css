@@ -1,0 +1,7 @@
+.admin-row-actions { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.admin-visibility-action { display: grid; gap: 3px; }
+.admin-visibility-action button { min-width: 68px; padding: 7px 10px; border: 1px solid; border-radius: 5px; background: #fff; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.admin-visibility-action button:disabled { opacity: .55; cursor: wait; }
+.admin-hide-button { border-color: #d3232a !important; color: #a61920; }
+.admin-show-button { border-color: #187447 !important; color: #17643b; }
+.admin-visibility-action small { margin: 0 !important; color: var(--admin-muted); font-size: 9px !important; }

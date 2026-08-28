@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { categories, getCategory } from "../../product-data";
-import { ballBearingProducts } from "../../ball-bearing-products";
 import CatalogBrowser from "../../catalog-browser";
+import { getManagedBallBearingProducts } from "../../managed-product-data";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
@@ -20,7 +20,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const category = getCategory(slug);
   if (!category) notFound();
 
-  if (category.slug === "ball-bearings") return <main className="catalog-page shop-page"><header className="nav"><a className="brand" href="/">Bearing <span>Mart BD</span></a><nav><a href="/about">About</a><a href="/#products">Products</a><a href="/contact">Contact</a></nav><a className="nav-call" href="https://wa.me/8801914528336">WhatsApp Now</a></header><section className="catalog-hero shop-hero"><p className="eyebrow">BALL BEARINGS</p><h1>Find the right<br />bearing <em>faster.</em></h1><p>Search by model number or brand, compare dimensions, and open a full product-details page.</p></section><CatalogBrowser products={ballBearingProducts}/></main>;
+  if (category.slug === "ball-bearings") { const products=await getManagedBallBearingProducts(); return <main className="catalog-page shop-page"><header className="nav"><a className="brand" href="/">Bearing <span>Mart BD</span></a><nav><a href="/about">About</a><a href="/#products">Products</a><a href="/contact">Contact</a></nav><a className="nav-call" href="https://wa.me/8801914528336">WhatsApp Now</a></header><section className="catalog-hero shop-hero"><p className="eyebrow">BALL BEARINGS</p><h1>Find the right<br />bearing <em>faster.</em></h1><p>Search by model number or brand, compare dimensions, and open a full product-details page.</p></section><CatalogBrowser products={products}/></main>; }
 
   return <main className="category-page">
     <header className="nav"><a className="brand" href="/" aria-label="Bearing Mart BD home">Bearing <span>Mart BD</span></a><nav aria-label="Main navigation"><a href="/#about">About</a><a href="/#products">Products</a><a href="/#contact">Contact</a></nav><a className="nav-call" href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">WhatsApp Now</a></header>
