@@ -8,13 +8,16 @@ export async function PATCH(request:Request,{params}:{params:Promise<{id:string}
   const auth=await authorizeApi("products.update"); if("response" in auth)return auth.response;
   const {id}=await params; let body:Record<string,unknown>;
   try{body=await request.json()}catch{return Response.json({error:"Invalid request body."},{status:400})}
+  const current=await env.DB.prepare("SELECT version,status,name,sort_order AS sortOrder FROM products WHERE id=?").bind(id).first<{version:number;status:string;name:string;sortOrder:number}>();
+  if(!current)return Response.json({error:"Product not found."},{status:404});
+  if("sortOrder" in body){
+    const sortOrder=Number(body.sortOrder); if(!Number.isInteger(sortOrder)||sortOrder<1||sortOrder>9999)return Response.json({error:"Website order must be a whole number between 1 and 9999."},{status:400});
+    const now=new Date().toISOString(); await env.DB.batch([env.DB.prepare("UPDATE products SET sort_order=?,version=version+1,updated_by=?,updated_at=? WHERE id=?").bind(sortOrder,auth.identity.userId,now,id),env.DB.prepare("INSERT INTO audit_events (id,actor_id,actor_email,action,resource_type,resource_id,details,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(crypto.randomUUID(),auth.identity.userId,auth.identity.email,"product.reorder","product",id,JSON.stringify({name:current.name,from:current.sortOrder,to:sortOrder}),now)]);
+    return Response.json({id,sortOrder,version:current.version+1});
+  }
   const status=String(body.status); if(status!=="draft"&&status!=="published")return Response.json({error:"Visibility status must be draft or published."},{status:400});
   if(status==="published"&&!auth.identity.permissions.has("*")&&!auth.identity.permissions.has("products.publish"))return Response.json({error:"Publishing permission is required."},{status:403});
-  const current=await env.DB.prepare("SELECT version,status,name FROM products WHERE id=?").bind(id).first<{version:number;status:string;name:string}>();
-  if(!current)return Response.json({error:"Product not found."},{status:404});
-  if(Number(body.version)!==current.version)return Response.json({error:"This product was changed by another editor. Refresh the page and try again."},{status:409});
-  const now=new Date().toISOString(); const result=await env.DB.prepare("UPDATE products SET status=?,version=version+1,updated_by=?,updated_at=?,published_at=CASE WHEN ?='published' AND published_at IS NULL THEN ? ELSE published_at END WHERE id=? AND version=?").bind(status,auth.identity.userId,now,status,now,id,current.version).run();
-  if(!result.meta.changes)return Response.json({error:"The product changed before the update completed. Refresh and try again."},{status:409});
+  const now=new Date().toISOString(); await env.DB.prepare("UPDATE products SET status=?,version=version+1,updated_by=?,updated_at=?,published_at=CASE WHEN ?='published' AND published_at IS NULL THEN ? ELSE published_at END WHERE id=?").bind(status,auth.identity.userId,now,status,now,id).run();
   await env.DB.prepare("INSERT INTO audit_events (id,actor_id,actor_email,action,resource_type,resource_id,details,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(crypto.randomUUID(),auth.identity.userId,auth.identity.email,status==="published"?"product.unhide":"product.hide","product",id,JSON.stringify({name:current.name,fromStatus:current.status,toStatus:status}),now).run();
   return Response.json({id,status,version:current.version+1});
 }

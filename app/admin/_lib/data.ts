@@ -4,12 +4,12 @@ export type AdminProduct = {
   id: string; name: string; slug: string; bearingNumber: string; sku: string | null;
   productType: string; categoryName: string; brandName: string | null; status: string;
   stockStatus: string; boreDiameter: number | null; outsideDiameter: number | null;
-  width: number | null; updatedAt: string; version: number;
+  width: number | null; sortOrder: number; updatedAt: string; version: number;
 };
 
 export async function listProducts(query = "") {
   const pattern = `%${query.trim()}%`;
-  const result = await env.DB.prepare(`SELECT p.id,p.name,p.slug,p.bearing_number AS bearingNumber,p.sku,p.product_type AS productType,c.name AS categoryName,b.name AS brandName,p.status,p.stock_status AS stockStatus,p.bore_diameter AS boreDiameter,p.outside_diameter AS outsideDiameter,p.width,p.updated_at AS updatedAt,p.version FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE (?='' OR p.name LIKE ? OR p.bearing_number LIKE ? OR p.sku LIKE ?) ORDER BY p.updated_at DESC LIMIT 100`).bind(query.trim(), pattern, pattern, pattern).all<AdminProduct>();
+  const result = await env.DB.prepare(`SELECT p.id,p.name,p.slug,p.bearing_number AS bearingNumber,p.sku,p.product_type AS productType,c.name AS categoryName,b.name AS brandName,p.status,p.stock_status AS stockStatus,p.bore_diameter AS boreDiameter,p.outside_diameter AS outsideDiameter,p.width,p.sort_order AS sortOrder,p.updated_at AS updatedAt,p.version FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE (?='' OR p.name LIKE ? OR p.bearing_number LIKE ? OR p.sku LIKE ?) ORDER BY p.sort_order,p.bearing_number LIMIT 100`).bind(query.trim(), pattern, pattern, pattern).all<AdminProduct>();
   return result.results;
 }
 

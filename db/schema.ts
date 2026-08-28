@@ -82,6 +82,7 @@ export const products = sqliteTable("products", {
   stockStatus: text("stock_status").notNull().default("confirm_availability"),
   leadTimeText: text("lead_time_text"),
   status: text("status", { enum: ["draft", "published", "archived"] }).notNull().default("draft"),
+  sortOrder: integer("sort_order").notNull().default(0),
   seoTitle: text("seo_title"),
   metaDescription: text("meta_description"),
   version: integer("version").notNull().default(1),
