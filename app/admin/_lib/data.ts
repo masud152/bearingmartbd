@@ -13,6 +13,14 @@ export async function listProducts(query = "") {
   return result.results;
 }
 
+export async function productFormOptions() {
+  const [categories, brands] = await Promise.all([
+    env.DB.prepare("SELECT slug,name FROM categories WHERE status='active' ORDER BY sort_order,name").all<{slug:string;name:string}>(),
+    env.DB.prepare("SELECT slug,name FROM brands WHERE status='active' ORDER BY name").all<{slug:string;name:string}>(),
+  ]);
+  return { categories: categories.results, brands: brands.results };
+}
+
 export async function dashboardStats() {
   const [products, published, draft, users, audit] = await Promise.all([
     env.DB.prepare("SELECT count(*) AS count FROM products WHERE status != 'archived'").first<{count:number}>(),
