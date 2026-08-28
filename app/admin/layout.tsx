@@ -4,6 +4,7 @@ import { can, requireAdmin } from "./_lib/auth";
 import "./admin.css";
 import "./access.css";
 import "./visibility.css";
+import "./customers.css";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const user = await requireAdmin("dashboard.view", "/admin");
   const links = [
     ["Dashboard", "/admin", "dashboard.view"], ["Products", "/admin/products", "products.view"],
+    ["Customers", "/admin/customers", "customers.view"],
     ["Users", "/admin/users", "users.view"], ["Roles & Permissions", "/admin/roles", "roles.view"],
     ["Audit Log", "/admin/audit", "audit.view"],
   ];

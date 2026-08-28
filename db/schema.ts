@@ -114,6 +114,24 @@ export const siteSettings = sqliteTable("site_settings", {
   updatedAt: text("updated_at").notNull(),
 });
 
+export const customers = sqliteTable("customers", {
+  id: text("id").primaryKey(),
+  customerType: text("customer_type", { enum: ["retail", "business"] }).notNull(),
+  fullName: text("full_name").notNull(),
+  companyName: text("company_name"),
+  responsiblePersonName: text("responsible_person_name"),
+  mobile: text("mobile").notNull(),
+  email: text("email").notNull(),
+  address: text("address").notNull(),
+  photoKey: text("photo_key"),
+  documentKey: text("document_key").notNull(),
+  documentType: text("document_type", { enum: ["nid", "trade_license"] }).notNull(),
+  status: text("status", { enum: ["pending_review", "verified", "rejected", "suspended"] }).notNull().default("pending_review"),
+  consentAt: text("consent_at").notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
 export const auditEvents = sqliteTable("audit_events", {
   id: text("id").primaryKey(),
   actorId: text("actor_id"),

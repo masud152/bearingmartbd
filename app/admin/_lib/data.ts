@@ -46,3 +46,15 @@ export async function listAudit() {
   const result = await env.DB.prepare("SELECT id,actor_email AS actorEmail,action,resource_type AS resourceType,resource_id AS resourceId,details,created_at AS createdAt FROM audit_events ORDER BY created_at DESC LIMIT 100").all<{id:string;actorEmail:string;action:string;resourceType:string;resourceId:string|null;details:string|null;createdAt:string}>();
   return result.results;
 }
+
+export type AdminCustomer = {
+  id:string; customerType:string; fullName:string; companyName:string|null;
+  responsiblePersonName:string|null; mobile:string; email:string; address:string;
+  hasPhoto:number; documentType:string; status:string; createdAt:string;
+};
+
+export async function listCustomers(query="") {
+  const pattern=`%${query.trim()}%`;
+  const result=await env.DB.prepare(`SELECT id,customer_type AS customerType,full_name AS fullName,company_name AS companyName,responsible_person_name AS responsiblePersonName,mobile,email,address,CASE WHEN photo_key IS NULL THEN 0 ELSE 1 END AS hasPhoto,document_type AS documentType,status,created_at AS createdAt FROM customers WHERE (?='' OR full_name LIKE ? OR company_name LIKE ? OR responsible_person_name LIKE ? OR mobile LIKE ? OR email LIKE ?) ORDER BY created_at DESC LIMIT 100`).bind(query.trim(),pattern,pattern,pattern,pattern,pattern).all<AdminCustomer>();
+  return result.results;
+}
