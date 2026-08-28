@@ -16,19 +16,20 @@ export async function generateMetadata({ params }: { params: Promise<{ number: s
   const { number } = await params;
   const product = await getManagedBallBearingProduct(number);
   if (!product) return {};
-  const [bearingNumber, type, bore, outer, width] = product;
+  const [bearingNumber, type, bore, outer, width, imageKey] = product;
   const productType = titleType(type);
   const title = `NSK ${bearingNumber} Bearing (${bore}×${outer}×${width} mm) | Bearing Mart BD`;
   const description = `Request a quotation for the NSK ${bearingNumber} ${productType.toLowerCase()}, size ${bore}×${outer}×${width} mm. Confirm current price, availability and delivery across Bangladesh.`;
   const url = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}`;
-  return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, type: "website" }, twitter: { card: "summary", title, description } };
+  const images = imageKey ? [`${SITE_URL}/api/product-images/${imageKey}`] : undefined;
+  return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, type: "website", images }, twitter: { card: "summary", title, description, images } };
 }
 
 export default async function ProductDetail({ params }: { params: Promise<{ number: string }> }) {
   const { number } = await params;
   const product = await getManagedBallBearingProduct(number);
   if (!product) notFound();
-  const [bearingNumber, type, bore, outer, width] = product;
+  const [bearingNumber, type, bore, outer, width, imageKey] = product;
   const productType = titleType(type);
   const productName = `NSK ${bearingNumber} ${productType}`;
   const dimensions = `${bore} × ${outer} × ${width} mm`;
@@ -52,7 +53,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ numb
     <section className="product-detail-wrap">
       <nav className="product-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#products">Products</a></li><li><a href="/products/ball-bearings">Ball Bearings</a></li><li aria-current="page">{bearingNumber}</li></ol></nav>
       <section className="product-hero-detail">
-        <div className="product-gallery" aria-label={`${productName} image unavailable`}><div className="product-placeholder" role="img" aria-label={`${productName}: product image unavailable`}><span className="bearing-drawing" /><strong>{bearingNumber}</strong><small>NSK</small></div><p>Product image available on request</p><section className="image-overview"><h2>Product Overview</h2><p>The NSK {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
+        <div className="product-gallery">{imageKey?<div className="product-uploaded-image"><img src={`/api/product-images/${imageKey}`} alt={productName}/></div>:<><div className="product-placeholder" role="img" aria-label={`${productName}: default bearing image`}><span className="bearing-drawing" /><strong>{bearingNumber}</strong><small>NSK</small></div><p>Product image available on request</p></>}<section className="image-overview"><h2>Product Overview</h2><p>The NSK {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
         <div className="product-info">
           <p className="eyebrow">{productType.toUpperCase()}</p><h1>{productName}</h1>
           <p className="product-identifiers"><span><b>Bearing number:</b> {bearingNumber}</span><span><b>Brand:</b> NSK</span></p>

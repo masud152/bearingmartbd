@@ -72,6 +72,7 @@ export const products = sqliteTable("products", {
   productType: text("product_type").notNull(),
   shortDescription: text("short_description"),
   description: text("description"),
+  imageKey: text("image_key"),
   boreDiameter: integer("bore_diameter"),
   outsideDiameter: integer("outside_diameter"),
   width: integer("width"),

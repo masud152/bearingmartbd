@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./product-images.css";
 import HitCounter from "./hit-counter";
 
 const geistSans = Geist({

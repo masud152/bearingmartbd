@@ -17,3 +17,6 @@
 .admin-close-panel { padding: 8px 12px; border: 1px solid #bfcbd5; border-radius: 5px; background: #fff; color: #31465b; font-weight: 800; cursor: pointer; }
 .admin-add-product-panel .admin-form { padding: 0; border: 0; box-shadow: none; }
 @media(max-width:600px){.admin-add-product-controller{justify-items:stretch;margin-top:-12px}.admin-add-product-controller>.admin-primary{justify-self:start}.admin-add-product-panel{padding:18px}.admin-add-product-heading{display:grid}}
+.admin-image-field p { margin: 0 0 10px; color: var(--admin-muted); font-size: 12px; font-weight: 400; }
+.admin-image-field input[type="file"] { min-height: auto; padding: 10px; border: 1px dashed #9eb0bf; background: #f8fafb; }
+.admin-image-field img { display: block; width: 150px; height: 150px; margin-top: 14px; border: 1px solid var(--admin-border); border-radius: 7px; background: #fff; object-fit: contain; }
