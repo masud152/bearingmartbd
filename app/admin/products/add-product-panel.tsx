@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import ProductForm from "./product-form";
 
 type FormOptions={categories:{slug:string;name:string}[];brands:{slug:string;name:string}[]};
 
 export default function AddProductPanel({options}:{options:FormOptions}){
   const [open,setOpen]=useState(false);
+  const pathname=usePathname();
+  if(pathname!=="/admin/products")return null;
   return <div className="admin-add-product-controller">
     <button type="button" className="admin-primary" onClick={()=>setOpen(true)} aria-expanded={open} aria-controls="add-product-panel">Add Product</button>
     {open&&<section id="add-product-panel" className="admin-add-product-panel" aria-labelledby="add-product-title">
