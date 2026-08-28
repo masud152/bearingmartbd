@@ -130,6 +130,16 @@ export const customers = sqliteTable("customers", {
   consentAt: text("consent_at").notNull(),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
+  passwordHash: text("password_hash"),
+  failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
+  lockedUntil: text("locked_until"),
+});
+
+export const customerSessions = sqliteTable("customer_sessions", {
+  id: text("id").primaryKey(),
+  customerId: text("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull(),
 });
 
 export const auditEvents = sqliteTable("audit_events", {
