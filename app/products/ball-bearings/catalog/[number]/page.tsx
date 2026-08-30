@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getManagedBallBearingProduct, getManagedBallBearingProducts } from "../../../../managed-product-data";
+import { PRODUCT_IMAGE_NOTE, productImageUrl } from "../../../../bearing-product-images";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ number: s
   const title = `NSK ${bearingNumber} Bearing (${bore}×${outer}×${width} mm) | Bearing Mart BD`;
   const description = `Request a quotation for the NSK ${bearingNumber} ${productType.toLowerCase()}, size ${bore}×${outer}×${width} mm. Confirm current price, availability and delivery across Bangladesh.`;
   const url = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}`;
-  const images = imageKey ? [`${SITE_URL}/api/product-images/${imageKey}`] : undefined;
+  const images = [`${SITE_URL}${productImageUrl(bearingNumber, imageKey)}`];
   return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, type: "website", images }, twitter: { card: "summary", title, description, images } };
 }
 
@@ -34,6 +35,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ numb
   const productName = `NSK ${bearingNumber} ${productType}`;
   const dimensions = `${bore} × ${outer} × ${width} mm`;
   const canonical = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}`;
+  const imageUrl = productImageUrl(bearingNumber, imageKey);
   const whatsappMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like a quotation for ${productName} (${dimensions}). Please confirm current price, stock and delivery.`);
   const photoMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like help identifying a bearing. I will send a clear photo of the bearing number and both sides.`);
   const quoteUrl = `/contact?product=${encodeURIComponent(productName)}&bearing=${bearingNumber}`;
@@ -45,7 +47,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ numb
     ["Seal / shield", "Open"], ["Number of rows", "Single row"], ["Internal clearance", "Confirm before ordering"],
     ["Country of origin", "Confirmed at quotation / supply"], ["SKU", `NSK-${bearingNumber}`],
   ];
-  const productSchema = { "@context": "https://schema.org", "@type": "Product", name: productName, sku: `NSK-${bearingNumber}`, mpn: bearingNumber, brand: { "@type": "Brand", name: "NSK" }, category: "Ball Bearings", description: `Single-row ${productType.toLowerCase()} with ${bore} mm bore, ${outer} mm outside diameter and ${width} mm width.`, url: canonical, additionalProperty: [{ "@type": "PropertyValue", name: "Bore diameter (d)", value: `${bore} mm` }, { "@type": "PropertyValue", name: "Outside diameter (D)", value: `${outer} mm` }, { "@type": "PropertyValue", name: "Width (B)", value: `${width} mm` }] };
+  const productSchema = { "@context": "https://schema.org", "@type": "Product", name: productName, image: `${SITE_URL}${imageUrl}`, sku: `NSK-${bearingNumber}`, mpn: bearingNumber, brand: { "@type": "Brand", name: "NSK" }, category: "Ball Bearings", description: `Single-row ${productType.toLowerCase()} with ${bore} mm bore, ${outer} mm outside diameter and ${width} mm width.`, url: canonical, additionalProperty: [{ "@type": "PropertyValue", name: "Bore diameter (d)", value: `${bore} mm` }, { "@type": "PropertyValue", name: "Outside diameter (D)", value: `${outer} mm` }, { "@type": "PropertyValue", name: "Width (B)", value: `${width} mm` }] };
   const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }, { "@type": "ListItem", position: 2, name: "Products", item: `${SITE_URL}/#products` }, { "@type": "ListItem", position: 3, name: "Ball Bearings", item: `${SITE_URL}/products/ball-bearings` }, { "@type": "ListItem", position: 4, name: bearingNumber, item: canonical }] };
 
   return <main className="detail-page">
@@ -53,7 +55,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ numb
     <section className="product-detail-wrap">
       <nav className="product-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#products">Products</a></li><li><a href="/products/ball-bearings">Ball Bearings</a></li><li aria-current="page">{bearingNumber}</li></ol></nav>
       <section className="product-hero-detail">
-        <div className="product-gallery">{imageKey?<div className="product-uploaded-image"><img src={`/api/product-images/${imageKey}`} alt={productName}/></div>:<><div className="product-placeholder" role="img" aria-label={`${productName}: default bearing image`}><span className="bearing-drawing" /><strong>{bearingNumber}</strong><small>NSK</small></div><p>Product image available on request</p></>}<section className="image-overview"><h2>Product Overview</h2><p>The NSK {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
+        <div className="product-gallery"><div className="product-uploaded-image"><img src={imageUrl} alt={`${productName} product view`} /></div><p>{imageKey ? "Uploaded product image" : PRODUCT_IMAGE_NOTE}</p><section className="image-overview"><h2>Product Overview</h2><p>The NSK {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
         <div className="product-info">
           <p className="eyebrow">{productType.toUpperCase()}</p><h1>{productName}</h1>
           <p className="product-identifiers"><span><b>Bearing number:</b> {bearingNumber}</span><span><b>Brand:</b> NSK</span></p>
