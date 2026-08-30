@@ -18,6 +18,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   ];
   return <main className="admin-shell">
     <aside className="admin-sidebar"><a className="admin-logo" href="/admin">Bearing <span>Mart BD</span><small>Administration</small></a><nav aria-label="Admin navigation">{links.filter(([, , permission]) => can(user, permission)).map(([label,href]) => <a href={href} key={href}>{label}</a>)}</nav><div className="admin-account"><strong>{user.displayName}</strong><span>{user.email}</span>{user.bootstrap && <em>Bootstrap administrator</em>}<a href={chatGPTSignOutPath("/")}>Sign out</a></div></aside>
-    <section className="admin-main"><header className="admin-topbar"><a href="/" target="_blank" rel="noreferrer">View website ↗</a></header>{children}</section>
+    <section className="admin-main"><header className="admin-topbar"><a href="https://bearingmartbd.com/" target="_blank" rel="noreferrer">View website ↗</a></header>{children}</section>
   </main>;
 }
