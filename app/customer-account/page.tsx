@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { headers } from "next/headers";
 import { getCustomerFromSession } from "../customer-auth";
 import CustomerLoginForm from "./login-form";
@@ -23,7 +22,7 @@ export default async function CustomerAccountPage() {
         <h2>Secure customer access</h2>
         <p>Use the email address or mobile number and password created during registration.</p>
         <CustomerLoginForm />
-        <div className="account-register-note"><span>Not registered yet?</span><Link href="/customer-registration">Create a customer account</Link></div>
+        <div className="account-register-note"><span>Not registered yet?</span><a href="https://bearingmartbd.com/customer-registration">Create a customer account</a></div>
       </div> : customer.status !== "verified" ? <div className="account-card account-notice">
         <span className={`account-status ${customer.status}`}>{customer.status.replaceAll("_", " ")}</span>
         <h2>Account access is unavailable</h2>
@@ -38,7 +37,7 @@ export default async function CustomerAccountPage() {
         <div className="account-card">
           <h2>Your customer dashboard</h2>
           <p>Your account is active. Additional General and Business customer permissions and services can be enabled later by Bearing Mart BD.</p>
-          <div className="account-actions"><Link className="button primary" href="/products/ball-bearings/catalog">Browse products</Link><LogoutButton /></div>
+          <div className="account-actions"><a className="button primary" href="https://bearingmartbd.com/products/ball-bearings">Browse products</a><LogoutButton /></div>
         </div>
       </div>}
     </section>
