@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { categories, getCategory } from "../../product-data";
 import CatalogBrowser from "../../catalog-browser";
 import { getManagedBallBearingProducts } from "../../managed-product-data";
+import CategoryCatalogBrowser from "../../category-catalog-browser";
+import { categoryCatalogue } from "../../category-catalog-data";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
@@ -33,12 +35,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (category.slug === "ball-bearings") { const products=await getManagedBallBearingProducts(); return <main className="catalog-page shop-page"><header className="nav"><a className="brand" href="/">Bearing <span>Mart BD</span></a><nav><a href="/about">About</a><a href="/#products">Products</a><a href="/our-brands">Our Brands</a><a href="/contact">Contact</a></nav><a className="nav-call" href="https://wa.me/8801914528336">WhatsApp Now</a></header><section className="catalog-hero shop-hero"><p className="eyebrow">BALL BEARINGS</p><h1>Find the right<br />bearing <em>faster.</em></h1><p>Search by model number or brand, compare dimensions, and open a full product-details page.</p></section><CatalogBrowser products={products}/><BrandAvailability/><section className="category-cta"><p>Need help confirming a brand?</p><a href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">Ask Bearing Mart BD on WhatsApp</a></section><footer><span>© {new Date().getFullYear()} Bearing Mart BD</span><span>Quality Bearings, Smooth Solutions</span></footer></main>; }
 
-  return <main className="category-page">
+  const catalogue = categoryCatalogue(category.slug);
+  return <main className="catalog-page shop-page">
     <header className="nav"><a className="brand" href="/" aria-label="Bearing Mart BD home">Bearing <span>Mart BD</span></a><nav aria-label="Main navigation"><a href="/#about">About</a><a href="/#products">Products</a><a href="/our-brands">Our Brands</a><a href="/#contact">Contact</a></nav><a className="nav-call" href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">WhatsApp Now</a></header>
-    <section className="category-hero"><p className="eyebrow">PRODUCT CATEGORY</p><a className="back-link" href="/#products">← Back to all categories</a><h1>{category.name}</h1><p>{category.description}</p></section>
-    <section className="category-content"><div><p className="eyebrow">OUR RANGE</p><h2>{category.subcategories ? "Available subcategories" : "Reliable industrial supply"}</h2></div>{category.subcategories ? <ol className="subcategory-list">{category.subcategories.map((subcategory, index) => <li key={subcategory}><span>0{index + 1}</span>{subcategory}</li>)}</ol> : <div className="category-note"><p>We can help you select the right {category.name.toLowerCase()} for your machinery and application.</p><a className="button primary" href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">Ask on WhatsApp</a></div>}</section>
+    <section className="catalog-hero shop-hero"><p className="eyebrow">{category.name.toUpperCase()}</p><a className="back-link" href="/#products">← Back to all categories</a><h1>Find the right<br />product <em>faster.</em></h1><p>{category.description} Search by brand, model and product type, then open the full details page.</p></section>
+    <CategoryCatalogBrowser categorySlug={category.slug} items={catalogue}/>
     <BrandAvailability/>
-    {category.slug === "ball-bearings" && <section className="catalog-link"><p className="eyebrow">PRODUCT CATALOGUE</p><h2>Browse Ball Bearing models</h2><p>View the 24 base products prepared from our catalogue file.</p><a className="button primary" href="/products/ball-bearings/catalog">Open Ball Bearings Catalogue</a></section>}
     <section className="category-cta"><p>Need help finding the right item?</p><a href="https://wa.me/8801914528336" target="_blank" rel="noreferrer">Chat with Bearing Mart BD on WhatsApp</a></section>
     <footer><span>© {new Date().getFullYear()} Bearing Mart BD</span><span>Quality Bearings, Smooth Solutions</span></footer>
   </main>;
