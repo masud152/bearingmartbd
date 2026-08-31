@@ -18,7 +18,7 @@ export default function CatalogBrowser({ products }: { products: readonly Produc
   const selectedSuffix = bearingOption(selectedBrand, suffix);
   const visible = useMemo(() => {
     const matchingBrand = products.filter(([, , , , , , productBrand = "NSK"]) => productBrand === brand);
-    const catalogue = matchingBrand.length > 0 ? matchingBrand : (brand === "SKF" || brand === "NTN") ? products.filter(([, , , , , , productBrand = "NSK"]) => productBrand === "NSK") : [];
+    const catalogue = matchingBrand.length > 0 ? matchingBrand : products.filter(([, , , , , , productBrand = "NSK"]) => productBrand === "NSK");
     return catalogue.filter(([number, type]) => `${number} ${type}`.toLowerCase().includes(model.trim().toLowerCase()));
   }, [products, brand, model]);
 
