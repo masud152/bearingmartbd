@@ -17,4 +17,8 @@ export function productImageUrl(bearingNumber: string, imageKey?: string | null)
   return imageKey ? `/api/product-images/${imageKey}` : IMAGE_BY_BEARING[bearingNumber] ?? "/bearing-products/nsk-deep-groove.jpg";
 }
 
+export function catalogueProductImageUrl(imageKey?: string | null) {
+  return imageKey ? `/api/product-images/${imageKey}` : "/realistic-bearing.png";
+}
+
 export const PRODUCT_IMAGE_NOTE = "Representative NSK product image. Seal, cage and suffix configuration may vary.";
