@@ -18,7 +18,7 @@ export function productImageUrl(bearingNumber: string, imageKey?: string | null)
 }
 
 export function catalogueProductImageUrl(imageKey?: string | null) {
-  return imageKey ? `/api/product-images/${imageKey}` : "/realistic-bearing.png";
+  return imageKey ? `/api/product-images/${imageKey}` : "/catalogue-bearing-perspective.png";
 }
 
 export const PRODUCT_IMAGE_NOTE = "Representative NSK product image. Seal, cage and suffix configuration may vary.";
