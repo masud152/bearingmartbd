@@ -55,3 +55,22 @@ export const categoryCatalogues: Record<string, readonly CatalogueItem[]> = {
 
 export function categoryCatalogue(slug: string) { return categoryCatalogues[slug] ?? []; }
 export function categoryCatalogueItem(slug: string, model: string) { return categoryCatalogue(slug).find((item) => item.model.toLowerCase() === model.toLowerCase()); }
+
+export function categoryCatalogueImage(slug: string, item: CatalogueItem) {
+  if (slug === "roller-bearings") return item.type.includes("Tapered") ? "/catalogue/roller/tapered.jpg" : "/catalogue/roller/cylindrical.jpg";
+  if (slug === "pillow-block-bearings") {
+    if (item.type.includes("Square") || item.type.includes("Round")) return "/catalogue/pillow/ucf.jpg";
+    if (item.type.includes("Oval")) return "/catalogue/pillow/ucfl.jpg";
+    return "/catalogue/pillow/ucp.jpg";
+  }
+  if (slug === "linear-bearings") return item.type.includes("Block") || item.type.includes("Support") ? "/catalogue/linear/block.png" : "/catalogue/linear/bushing.webp";
+  if (slug === "bearing-housings") return item.type.includes("Adapter") ? "/catalogue/accessories/adapter.jpg" : "/catalogue/housings/plummer.jpg";
+  if (slug === "industrial-accessories") {
+    if (item.type.includes("Seal")) return "/catalogue/accessories/oil-seal.jpg";
+    if (item.type.includes("Circlip")) return "/catalogue/accessories/circlip.jpg";
+    if (item.type.includes("Grease")) return "/catalogue/accessories/grease.jpg";
+    if (item.type.includes("Nut") || item.type.includes("Washer")) return "/catalogue/accessories/locknut.jpg";
+    return "/catalogue/accessories/adapter.jpg";
+  }
+  return "/bearing-product.jpg";
+}
