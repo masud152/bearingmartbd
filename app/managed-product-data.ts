@@ -12,14 +12,19 @@ export async function getManagedBallBearingProducts(): Promise<readonly BallBear
   }
 }
 
-export async function getManagedBallBearingProduct(number: string): Promise<BallBearingRecord | undefined> {
+export async function getManagedBallBearingProduct(number: string, brand?: string): Promise<BallBearingRecord | undefined> {
   try {
-    const record = await env.DB.prepare(`SELECT p.bearing_number AS bearingNumber,p.product_type AS productType,p.bore_diameter AS bore,p.outside_diameter AS outerDiameter,p.width,p.image_key AS imageKey,p.status,COALESCE(b.name,'Unbranded') AS brandName FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE p.bearing_number=? AND c.slug='ball-bearings' LIMIT 1`).bind(number).first<{ bearingNumber:string; productType:string; bore:number|null; outerDiameter:number|null; width:number|null; imageKey:string|null; status:string; brandName:string }>();
+    const query = brand
+      ? `SELECT p.bearing_number AS bearingNumber,p.product_type AS productType,p.bore_diameter AS bore,p.outside_diameter AS outerDiameter,p.width,p.image_key AS imageKey,p.status,COALESCE(b.name,'Unbranded') AS brandName FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE p.bearing_number=? AND c.slug='ball-bearings' AND b.name=? LIMIT 1`
+      : `SELECT p.bearing_number AS bearingNumber,p.product_type AS productType,p.bore_diameter AS bore,p.outside_diameter AS outerDiameter,p.width,p.image_key AS imageKey,p.status,COALESCE(b.name,'Unbranded') AS brandName FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE p.bearing_number=? AND c.slug='ball-bearings' LIMIT 1`;
+    const statement = env.DB.prepare(query);
+    const record = await (brand ? statement.bind(number, brand) : statement.bind(number)).first<{ bearingNumber:string; productType:string; bore:number|null; outerDiameter:number|null; width:number|null; imageKey:string|null; status:string; brandName:string }>();
     if (record && record.status !== "published") return undefined;
     if (record && record.bore != null && record.outerDiameter != null && record.width != null) return [record.bearingNumber, record.productType, record.bore, record.outerDiameter, record.width, record.imageKey??undefined, record.brandName];
   } catch {
     // The static catalogue remains the safe fallback before the D1 migration is applied.
   }
+  if (brand && brand !== "NSK") return undefined;
   const fallback = getBallBearingProduct(number);
   return fallback ? [...fallback, "NSK"] as BallBearingRecord : undefined;
 }

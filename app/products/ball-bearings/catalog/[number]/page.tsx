@@ -41,14 +41,14 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const { number } = await params;
   const { brand: requestedBrand } = await searchParams;
   const brand = catalogueBrand(requestedBrand);
-  const product = await getManagedBallBearingProduct(number);
+  const product = await getManagedBallBearingProduct(number, brand);
   if (!product) return {};
   const [bearingNumber, type, bore, outer, width, imageKey, productBrand = "NSK"] = product;
   const productType = titleType(type);
   const title = `${brand} ${bearingNumber} Bearing (${bore}×${outer}×${width} mm) | Bearing Mart BD`;
   const description = `Request a quotation for the ${brand} ${bearingNumber} ${productType.toLowerCase()}, size ${bore}×${outer}×${width} mm. Confirm current price, availability and delivery across Bangladesh.`;
   const url = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}?brand=${brand}`;
-  const images = productBrand === brand ? [`${SITE_URL}${productImageUrl(bearingNumber, imageKey)}`] : [];
+  const images = productBrand === brand && imageKey ? [`${SITE_URL}${productImageUrl(bearingNumber, imageKey)}`] : [];
   return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, type: "website", images }, twitter: { card: "summary", title, description, images } };
 }
 
@@ -57,7 +57,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
   const { brand: requestedBrand, suffix: requestedSuffix } = await searchParams;
   const brand = catalogueBrand(requestedBrand);
   const suffix = bearingOption(brand, requestedSuffix);
-  const product = await getManagedBallBearingProduct(number);
+  const product = await getManagedBallBearingProduct(number, brand);
   if (!product) notFound();
   const [bearingNumber, type, bore, outer, width, imageKey, productBrand = "NSK"] = product;
   const productType = titleType(type);
@@ -65,7 +65,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
   const productName = `${brand} ${designation} ${productType}`;
   const dimensions = `${bore} × ${outer} × ${width} mm`;
   const canonical = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}?brand=${brand}`;
-  const imageUrl = productBrand === brand ? productImageUrl(bearingNumber, imageKey) : null;
+  const imageUrl = productBrand === brand && imageKey ? productImageUrl(bearingNumber, imageKey) : null;
   const whatsappMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like a quotation for ${productName} (${dimensions}). Please confirm current price, stock and delivery.`);
   const photoMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like help identifying a bearing. I will send a clear photo of the bearing number and both sides.`);
   const quoteUrl = `/contact?product=${encodeURIComponent(productName)}&bearing=${designation}`;

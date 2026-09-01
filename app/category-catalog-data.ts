@@ -57,24 +57,27 @@ export function categoryCatalogue(slug: string) { return categoryCatalogues[slug
 export function categoryCatalogueItem(slug: string, model: string) { return categoryCatalogue(slug).find((item) => item.model.toLowerCase() === model.toLowerCase()); }
 
 export function categoryCatalogueImage(slug: string, item: CatalogueItem, brand = "SKF"): string | null {
-  if (slug === "roller-bearings") {
-    const brandImages: Record<string, string> = {
+  const brandImagesByCategory: Record<string, Record<string, string>> = {
+    "roller-bearings": {
       SKF: "/catalogue/brands/roller/skf.jpg", NSK: "/catalogue/brands/roller/nsk.png", NTN: "/catalogue/brands/roller/ntn.jpg",
       "KOYO/JTEKT": "/catalogue/brands/roller/koyo.jpg", TIMKEN: "/catalogue/brands/roller/timken.jpg", NACHI: "/catalogue/brands/roller/nachi.jpg",
       FAG: "/catalogue/brands/roller/fag.jpg", INA: "/catalogue/brands/roller/ina.webp", IKO: "/catalogue/brands/roller/iko.jpg",
-    };
-    return brandImages[brand] ?? null;
-  }
-  if (slug === "pillow-block-bearings") {
-    if (brand !== "NTN") return null;
-    if (item.type.includes("Square") || item.type.includes("Round")) return "/catalogue/pillow/ucf.jpg";
-    if (item.type.includes("Oval")) return "/catalogue/pillow/ucfl.jpg";
-    return "/catalogue/pillow/ucf.jpg";
-  }
-  if (slug === "linear-bearings") return null;
-  if (slug === "bearing-housings") return brand === "SKF" ? "/catalogue/housings/plummer.jpg" : null;
-  if (slug === "industrial-accessories") {
-    return null;
-  }
-  return null;
+    },
+    "pillow-block-bearings": {
+      SKF: "/catalogue/brands/pillow/skf.png", NSK: "/catalogue/brands/pillow/nsk.jpg", NTN: "/catalogue/brands/pillow/ntn.jpg",
+      "KOYO/JTEKT": "/catalogue/brands/pillow/koyo.jpg", TIMKEN: "/catalogue/brands/pillow/timken.jpg",
+      FAG: "/catalogue/brands/pillow/fag.png", INA: "/catalogue/brands/pillow/ina.jpg",
+    },
+    "linear-bearings": {
+      SKF: "/catalogue/brands/linear/skf.jpg", NSK: "/catalogue/brands/linear/nsk.png",
+      INA: "/catalogue/brands/linear/ina.jpg", IKO: "/catalogue/brands/linear/iko.jpg",
+    },
+    "bearing-housings": {
+      SKF: "/catalogue/housings/plummer.jpg", FAG: "/catalogue/brands/housing/fag.jpg", INA: "/catalogue/brands/housing/ina.jpg",
+    },
+    // Accessories cover several unrelated product families. A brand image is intentionally
+    // withheld until an exact, verified photo is uploaded for the selected accessory.
+    "industrial-accessories": {},
+  };
+  return brandImagesByCategory[slug]?.[brand] ?? null;
 }
