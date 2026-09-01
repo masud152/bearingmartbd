@@ -37,7 +37,7 @@ export default function CatalogBrowser({ products }: { products: readonly Produc
       <div className="shop-grid">{visible.map(([number, type, bore, outer, width, imageKey]) => {
         const designation = bearingDesignation(number, selectedBrand, suffix);
         return <article className="shop-card" key={number}>
-          <div className="shop-bearing"><img src={catalogueProductImageUrl(imageKey)} alt={`Full view of ${brand} ${designation} ${type}`} loading="lazy" /></div>
+          <div className="shop-bearing brand-aware-image" data-brand={brand}><img src={`${catalogueProductImageUrl(imageKey)}?brand=${encodeURIComponent(brand)}`} alt={`Reference view for ${brand} ${designation} ${type}`} loading="lazy" /><span className="image-brand-badge">{brand}</span></div>
           <p className="product-brand">{brand}</p><h3>{designation}</h3><p>{type}</p>
           <dl><div><dt>Size</dt><dd>{bore} × {outer} × {width} mm</dd></div><div><dt>Suffix</dt><dd>{suffix || "Open"}</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl>
           <a className="details-button" href={`/products/ball-bearings/catalog/${number}?brand=${encodeURIComponent(brand)}${suffix ? `&suffix=${encodeURIComponent(suffix)}` : ""}`}>View full details →</a>
