@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { categoryCatalogueImage, type CatalogueItem } from "./category-catalog-data";
 
+const DEFAULT_CATALOGUE_IMAGE = "/catalogue-bearing-perspective.png";
+
 const stockedBrands = ["SKF", "NSK", "NTN", "KOYO/JTEKT", "TIMKEN", "NACHI"];
 const importBrands = ["FAG", "INA", "IKO"];
 
@@ -20,6 +22,6 @@ export default function CategoryCatalogBrowser({ categorySlug, items }: { catego
       <label>3. Product type<select value={type} onChange={(event) => setType(event.target.value)}><option value="">All product types</option>{types.map((name) => <option value={name} key={name}>{name}</option>)}</select></label>
       <p className="filter-note">Catalogue references support product identification. Confirm the complete designation, dimensions, specification and current availability before ordering.</p>
     </aside>
-    <div className="catalog-results"><div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Brand: {brand}</span></div><div className="shop-grid">{visible.map((item) => { const image = categoryCatalogueImage(categorySlug, item, brand); return <article className="shop-card" key={item.model}>{image ? <div className="shop-bearing"><img src={image} alt={`Real ${brand} ${item.type} reference product`} loading="lazy" /></div> : <div className="shop-bearing image-pending" role="img" aria-label={`${brand} product photo pending`}><strong>Photo pending</strong><small>{brand}</small></div>}<p className="product-brand">{brand}</p><h3>{item.model}</h3><p>{item.type}</p><p>{item.summary}</p><dl><div><dt>Specification</dt><dd>Confirm</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl><a className="details-button" href={`/products/${categorySlug}/catalog/${encodeURIComponent(item.model)}?brand=${encodeURIComponent(brand)}`}>View full details →</a></article>;})}</div>{visible.length === 0 && <div className="empty-results"><h3>No matching product found.</h3><p>Try another model or type, or contact us for sourcing support.</p></div>}</div>
+    <div className="catalog-results"><div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Brand: {brand}</span></div><div className="shop-grid">{visible.map((item) => { const image = categoryCatalogueImage(categorySlug, item, brand); return <article className="shop-card" key={item.model}><div className="shop-bearing"><img src={image ?? DEFAULT_CATALOGUE_IMAGE} alt={image ? `Real ${brand} ${item.type} reference product` : `Representative ${item.type} catalogue image`} loading="lazy" /></div><p className="product-brand">{brand}</p><h3>{item.model}</h3><p>{item.type}</p><p>{item.summary}</p><dl><div><dt>Specification</dt><dd>Confirm</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl><a className="details-button" href={`/products/${categorySlug}/catalog/${encodeURIComponent(item.model)}?brand=${encodeURIComponent(brand)}`}>View full details →</a></article>;})}</div>{visible.length === 0 && <div className="empty-results"><h3>No matching product found.</h3><p>Try another model or type, or contact us for sourcing support.</p></div>}</div>
   </section>;
 }

@@ -35,9 +35,9 @@ export default function CatalogBrowser({ products }: { products: readonly Produc
       <div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Configuration: {brand}{suffix ? ` · ${suffix}` : " · Open"}</span></div>
       <div className="shop-grid">{visible.map(([number, type, bore, outer, width, imageKey]) => {
         const designation = bearingDesignation(number, selectedBrand, suffix);
-        const image = imageKey ? catalogueProductImageUrl(imageKey) : null;
+        const image = catalogueProductImageUrl(imageKey);
         return <article className="shop-card" key={number}>
-          {image ? <div className="shop-bearing"><img src={image} alt={`Real ${brand} ${designation} ${type} product`} loading="lazy" /></div> : <div className="shop-bearing image-pending" role="img" aria-label={`${brand} product photo pending`}><strong>Photo pending</strong><small>{brand}</small></div>}
+          <div className="shop-bearing"><img src={image} alt={imageKey ? `Real ${brand} ${designation} ${type} product` : `Representative ${type} catalogue image`} loading="lazy" /></div>
           <p className="product-brand">{brand}</p><h3>{designation}</h3><p>{type}</p>
           <dl><div><dt>Size</dt><dd>{bore} × {outer} × {width} mm</dd></div><div><dt>Suffix</dt><dd>{suffix || "Open"}</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl>
           <a className="details-button" href={`/products/ball-bearings/catalog/${number}?brand=${encodeURIComponent(brand)}${suffix ? `&suffix=${encodeURIComponent(suffix)}` : ""}`}>View full details →</a>

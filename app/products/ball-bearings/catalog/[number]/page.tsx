@@ -65,7 +65,8 @@ export default async function ProductDetail({ params, searchParams }: { params: 
   const productName = `${brand} ${designation} ${productType}`;
   const dimensions = `${bore} × ${outer} × ${width} mm`;
   const canonical = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}?brand=${brand}`;
-  const imageUrl = productBrand === brand && imageKey ? productImageUrl(bearingNumber, imageKey) : null;
+  const hasVerifiedImage = productBrand === brand && Boolean(imageKey);
+  const imageUrl = hasVerifiedImage ? productImageUrl(bearingNumber, imageKey) : "/catalogue-bearing-perspective.png";
   const whatsappMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like a quotation for ${productName} (${dimensions}). Please confirm current price, stock and delivery.`);
   const photoMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like help identifying a bearing. I will send a clear photo of the bearing number and both sides.`);
   const quoteUrl = `/contact?product=${encodeURIComponent(productName)}&bearing=${designation}`;
@@ -85,7 +86,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
     <section className="product-detail-wrap">
       <nav className="product-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#products">Products</a></li><li><a href="/products/ball-bearings">Ball Bearings</a></li><li aria-current="page">{bearingNumber}</li></ol></nav>
       <section className="product-hero-detail">
-        <div className="product-gallery">{imageUrl ? <div className="product-uploaded-image"><img src={imageUrl} alt={`Real ${productName} product view`} /></div> : <div className="product-uploaded-image image-pending"><strong>Brand-specific photo pending</strong><small>{brand} · {designation}</small></div>}<p>{imageUrl ? `Uploaded ${brand} product image` : `No verified ${brand} image is available for this record; another brand's photo is not substituted.`}</p><section className="image-overview"><h2>Product Overview</h2><p>The {brand} {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
+        <div className="product-gallery"><div className="product-uploaded-image"><img src={imageUrl} alt={hasVerifiedImage ? `Real ${productName} product view` : `Representative ${productType} catalogue image`} /></div><p>{hasVerifiedImage ? `Uploaded ${brand} product image` : "Representative catalogue image. Confirm the exact brand, model and appearance before ordering."}</p><section className="image-overview"><h2>Product Overview</h2><p>The {brand} {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
         <div className="product-info">
           <p className="eyebrow">{productType.toUpperCase()}</p><h1>{productName}</h1>
           <p className="product-identifiers"><span><b>Bearing designation:</b> {designation}</span><span><b>Brand:</b> {brand}</span><span><b>Configuration:</b> {suffix.label}</span></p>
