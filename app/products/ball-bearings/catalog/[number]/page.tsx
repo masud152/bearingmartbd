@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getManagedBallBearingProduct, getManagedBallBearingProducts } from "../../../../managed-product-data";
-import { PRODUCT_IMAGE_NOTE, productImageUrl } from "../../../../bearing-product-images";
+import { productImageUrl } from "../../../../bearing-product-images";
 import { bearingDesignation, bearingOption, brandBearingOptions, catalogueBrand } from "../../../../brand-bearing-options";
 
 export const dynamic = "force-dynamic";
@@ -43,12 +43,12 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const brand = catalogueBrand(requestedBrand);
   const product = await getManagedBallBearingProduct(number);
   if (!product) return {};
-  const [bearingNumber, type, bore, outer, width, imageKey] = product;
+  const [bearingNumber, type, bore, outer, width, imageKey, productBrand = "NSK"] = product;
   const productType = titleType(type);
   const title = `${brand} ${bearingNumber} Bearing (${bore}×${outer}×${width} mm) | Bearing Mart BD`;
   const description = `Request a quotation for the ${brand} ${bearingNumber} ${productType.toLowerCase()}, size ${bore}×${outer}×${width} mm. Confirm current price, availability and delivery across Bangladesh.`;
   const url = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}?brand=${brand}`;
-  const images = [`${SITE_URL}${productImageUrl(bearingNumber, imageKey)}`];
+  const images = productBrand === brand ? [`${SITE_URL}${productImageUrl(bearingNumber, imageKey)}`] : [];
   return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, type: "website", images }, twitter: { card: "summary", title, description, images } };
 }
 
@@ -59,13 +59,13 @@ export default async function ProductDetail({ params, searchParams }: { params: 
   const suffix = bearingOption(brand, requestedSuffix);
   const product = await getManagedBallBearingProduct(number);
   if (!product) notFound();
-  const [bearingNumber, type, bore, outer, width, imageKey] = product;
+  const [bearingNumber, type, bore, outer, width, imageKey, productBrand = "NSK"] = product;
   const productType = titleType(type);
   const designation = bearingDesignation(bearingNumber, brand, suffix.value);
   const productName = `${brand} ${designation} ${productType}`;
   const dimensions = `${bore} × ${outer} × ${width} mm`;
   const canonical = `${SITE_URL}/products/ball-bearings/catalog/${bearingNumber}?brand=${brand}`;
-  const imageUrl = `${productImageUrl(bearingNumber, imageKey)}?brand=${encodeURIComponent(brand)}`;
+  const imageUrl = productBrand === brand ? productImageUrl(bearingNumber, imageKey) : null;
   const whatsappMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like a quotation for ${productName} (${dimensions}). Please confirm current price, stock and delivery.`);
   const photoMessage = encodeURIComponent(`Hello Bearing Mart BD, I would like help identifying a bearing. I will send a clear photo of the bearing number and both sides.`);
   const quoteUrl = `/contact?product=${encodeURIComponent(productName)}&bearing=${designation}`;
@@ -77,7 +77,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
     ["Selected suffix / variant", suffix.label], ["Seal / shield", sealDescription(suffix.value)], ["Number of rows", "Single row"], ["Internal clearance", clearanceDescription(suffix.value)],
     ["Country of origin", "Confirmed at quotation / supply"], ["SKU", `${brand}-${designation}`],
   ];
-  const productSchema = { "@context": "https://schema.org", "@type": "Product", name: productName, image: `${SITE_URL}${imageUrl}`, sku: `${brand}-${designation}`, mpn: designation, brand: { "@type": "Brand", name: brand }, category: "Ball Bearings", description: `Single-row ${productType.toLowerCase()} with ${bore} mm bore, ${outer} mm outside diameter and ${width} mm width. Selected configuration: ${suffix.label}.`, url: canonical, additionalProperty: [{ "@type": "PropertyValue", name: "Bore diameter (d)", value: `${bore} mm` }, { "@type": "PropertyValue", name: "Outside diameter (D)", value: `${outer} mm` }, { "@type": "PropertyValue", name: "Width (B)", value: `${width} mm` }, { "@type": "PropertyValue", name: "Suffix / variant", value: suffix.label }] };
+  const productSchema = { "@context": "https://schema.org", "@type": "Product", name: productName, ...(imageUrl ? { image: `${SITE_URL}${imageUrl}` } : {}), sku: `${brand}-${designation}`, mpn: designation, brand: { "@type": "Brand", name: brand }, category: "Ball Bearings", description: `Single-row ${productType.toLowerCase()} with ${bore} mm bore, ${outer} mm outside diameter and ${width} mm width. Selected configuration: ${suffix.label}.`, url: canonical, additionalProperty: [{ "@type": "PropertyValue", name: "Bore diameter (d)", value: `${bore} mm` }, { "@type": "PropertyValue", name: "Outside diameter (D)", value: `${outer} mm` }, { "@type": "PropertyValue", name: "Width (B)", value: `${width} mm` }, { "@type": "PropertyValue", name: "Suffix / variant", value: suffix.label }] };
   const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }, { "@type": "ListItem", position: 2, name: "Products", item: `${SITE_URL}/#products` }, { "@type": "ListItem", position: 3, name: "Ball Bearings", item: `${SITE_URL}/products/ball-bearings` }, { "@type": "ListItem", position: 4, name: bearingNumber, item: canonical }] };
 
   return <main className="detail-page">
@@ -85,7 +85,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
     <section className="product-detail-wrap">
       <nav className="product-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#products">Products</a></li><li><a href="/products/ball-bearings">Ball Bearings</a></li><li aria-current="page">{bearingNumber}</li></ol></nav>
       <section className="product-hero-detail">
-        <div className="product-gallery"><div className="product-uploaded-image brand-aware-image" data-brand={brand}><img src={imageUrl} alt={`${productName} reference product view`} /><span className="image-brand-badge">{brand}</span></div><p>{imageKey ? `Selected ${brand} catalogue reference image` : PRODUCT_IMAGE_NOTE}</p><section className="image-overview"><h2>Product Overview</h2><p>The {brand} {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
+        <div className="product-gallery">{imageUrl ? <div className="product-uploaded-image"><img src={imageUrl} alt={`Real ${productName} product view`} /></div> : <div className="product-uploaded-image image-pending"><strong>Brand-specific photo pending</strong><small>{brand} · {designation}</small></div>}<p>{imageUrl ? `Uploaded ${brand} product image` : `No verified ${brand} image is available for this record; another brand's photo is not substituted.`}</p><section className="image-overview"><h2>Product Overview</h2><p>The {brand} {bearingNumber} is a single-row {productType.toLowerCase()} designed for radial loads and moderate axial loads in both directions. Its compact {dimensions} dimensions make it suitable for small electric motors, pumps, fans, power tools, light machinery and general industrial equipment.</p></section></div>
         <div className="product-info">
           <p className="eyebrow">{productType.toUpperCase()}</p><h1>{productName}</h1>
           <p className="product-identifiers"><span><b>Bearing designation:</b> {designation}</span><span><b>Brand:</b> {brand}</span><span><b>Configuration:</b> {suffix.label}</span></p>

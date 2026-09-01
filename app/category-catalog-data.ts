@@ -56,21 +56,25 @@ export const categoryCatalogues: Record<string, readonly CatalogueItem[]> = {
 export function categoryCatalogue(slug: string) { return categoryCatalogues[slug] ?? []; }
 export function categoryCatalogueItem(slug: string, model: string) { return categoryCatalogue(slug).find((item) => item.model.toLowerCase() === model.toLowerCase()); }
 
-export function categoryCatalogueImage(slug: string, item: CatalogueItem) {
-  if (slug === "roller-bearings") return item.type.includes("Tapered") ? "/catalogue/roller/tapered.jpg" : "/catalogue/roller/cylindrical.jpg";
+export function categoryCatalogueImage(slug: string, item: CatalogueItem, brand = "SKF"): string | null {
+  if (slug === "roller-bearings") {
+    const brandImages: Record<string, string> = {
+      SKF: "/catalogue/brands/roller/skf.jpg", NSK: "/catalogue/brands/roller/nsk.png", NTN: "/catalogue/brands/roller/ntn.jpg",
+      "KOYO/JTEKT": "/catalogue/brands/roller/koyo.jpg", TIMKEN: "/catalogue/brands/roller/timken.jpg", NACHI: "/catalogue/brands/roller/nachi.jpg",
+      FAG: "/catalogue/brands/roller/fag.jpg", INA: "/catalogue/brands/roller/ina.webp", IKO: "/catalogue/brands/roller/iko.jpg",
+    };
+    return brandImages[brand] ?? null;
+  }
   if (slug === "pillow-block-bearings") {
+    if (brand !== "NTN") return null;
     if (item.type.includes("Square") || item.type.includes("Round")) return "/catalogue/pillow/ucf.jpg";
     if (item.type.includes("Oval")) return "/catalogue/pillow/ucfl.jpg";
-    return "/catalogue/pillow/ucp.jpg";
+    return "/catalogue/pillow/ucf.jpg";
   }
-  if (slug === "linear-bearings") return item.type.includes("Block") || item.type.includes("Support") ? "/catalogue/linear/block.png" : "/catalogue/linear/bushing.webp";
-  if (slug === "bearing-housings") return item.type.includes("Adapter") ? "/catalogue/accessories/adapter.jpg" : "/catalogue/housings/plummer.jpg";
+  if (slug === "linear-bearings") return null;
+  if (slug === "bearing-housings") return brand === "SKF" ? "/catalogue/housings/plummer.jpg" : null;
   if (slug === "industrial-accessories") {
-    if (item.type.includes("Seal")) return "/catalogue/accessories/oil-seal.jpg";
-    if (item.type.includes("Circlip")) return "/catalogue/accessories/circlip.jpg";
-    if (item.type.includes("Grease")) return "/catalogue/accessories/grease.jpg";
-    if (item.type.includes("Nut") || item.type.includes("Washer")) return "/catalogue/accessories/locknut.jpg";
-    return "/catalogue/accessories/adapter.jpg";
+    return null;
   }
-  return "/bearing-product.jpg";
+  return null;
 }
