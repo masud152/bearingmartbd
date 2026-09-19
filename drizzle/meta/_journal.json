@@ -48,7 +48,28 @@
       "idx": 6,
       "version": "7",
       "when": 1787914800000,
-      "tag": "0006_customer_password_resets",
+      "tag": "0006_available_brands",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787918400000,
+      "tag": "0007_customer_password_resets",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787922000000,
+      "tag": "0008_ball_bearing_brands",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787925600000,
+      "tag": "0009_admin_all_category_catalogue",
       "breakpoints": true
     }
   ]
