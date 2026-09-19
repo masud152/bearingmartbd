@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCustomerFromSession } from "../customer-auth";
 import LogoutButton from "../customer-account/logout-button";
+import ProfileForm from "./profile-form";
 import "../customer-account/customer-account.css";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +33,8 @@ export default async function CustomerProfilePage() {
         </div>
         <div className="account-card">
           <h2>Your customer profile</h2>
-          <p>Your account information and access status are shown here.</p>
+          <p>Keep your contact and business details up to date.</p>
+          <ProfileForm profile={customer} />
           <div className="account-actions">
             <a className="button primary" href="https://bearingmartbd.com/products/ball-bearings/catalog">Browse products</a>
             <LogoutButton />

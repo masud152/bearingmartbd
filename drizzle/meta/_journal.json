@@ -71,6 +71,13 @@
       "when": 1787925600000,
       "tag": "0009_admin_all_category_catalogue",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789930800000,
+      "tag": "0010_super_admin_customer_permission",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,9 @@
+"use client";
+import { useState, type FormEvent } from "react";
+
+type Profile = { fullName: string; mobile: string; companyName: string | null; responsiblePersonName: string | null; address: string };
+export default function ProfileForm({ profile }: { profile: Profile }) {
+  const [message, setMessage] = useState(""); const [busy, setBusy] = useState(false);
+  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setBusy(true); setMessage(""); const form = new FormData(event.currentTarget); const response = await fetch("/api/customers/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries(form)) }); const data = await response.json() as { error?: string }; setBusy(false); setMessage(response.ok ? "Profile updated successfully." : data.error ?? "Profile update could not be saved."); }
+  return <form className="customer-login-form profile-form" onSubmit={submit}><label>Full name<input name="fullName" required defaultValue={profile.fullName} autoComplete="name" /></label><label>Mobile number<input name="mobile" required defaultValue={profile.mobile} autoComplete="tel" /></label><label>Company name <small>Optional</small><input name="companyName" defaultValue={profile.companyName ?? ""} autoComplete="organization" /></label><label>Responsible person <small>Optional</small><input name="responsiblePersonName" defaultValue={profile.responsiblePersonName ?? ""} /></label><label>Address<textarea name="address" required defaultValue={profile.address} autoComplete="street-address" /></label><p className="profile-email">Your registered email address cannot be changed here.</p>{message && <p className={message.includes("successfully") ? "account-notice" : "account-error"} role="status">{message}</p>}<button className="button primary" disabled={busy}>{busy ? "Saving…" : "Save profile"}</button></form>;
+}
