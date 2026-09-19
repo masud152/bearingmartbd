@@ -1,0 +1,46 @@
+-- Make the complete public catalogue manageable from the Admin Products list.
+WITH product_seed(id,name,slug,bearing_number,sku,category_id,brand_id,product_type,stock_status,sort_order) AS (
+  VALUES
+  ('prod_roller_30205','SKF 30205 Tapered Roller Bearings','30205','30205','SKF-30205','cat_roller','brand_skf','Tapered Roller Bearings','in_stock',101),
+  ('prod_roller_nu205','NSK NU 205 Cylindrical Roller Bearings','nu-205','NU 205','NSK-NU205','cat_roller','brand_nsk','Cylindrical Roller Bearings','in_stock',102),
+  ('prod_roller_22205','NTN 22205 Spherical Roller Bearings','22205','22205','NTN-22205','cat_roller','brand_ntn','Spherical Roller Bearings','in_stock',103),
+  ('prod_roller_hk1010','IKO HK 1010 Needle Roller Bearings','hk-1010','HK 1010','IKO-HK1010','cat_roller','brand_iko','Needle Roller Bearings','available_on_order',104),
+  ('prod_roller_81105','TIMKEN 81105 Thrust Roller Bearings','81105','81105','TIMKEN-81105','cat_roller','brand_timken','Thrust Roller Bearings','in_stock',105),
+  ('prod_roller_ncf2920','NACHI NCF 2920 Full Complement Roller Bearings','ncf-2920','NCF 2920','NACHI-NCF2920','cat_roller','brand_nachi','Full Complement Roller Bearings','in_stock',106),
+  ('prod_pillow_ucp205','SKF UCP 205 UCP','ucp-205','UCP 205','SKF-UCP205','cat_pillow','brand_skf','UCP','in_stock',201),
+  ('prod_pillow_ucf205','NSK UCF 205 UCF','ucf-205','UCF 205','NSK-UCF205','cat_pillow','brand_nsk','UCF','in_stock',202),
+  ('prod_pillow_ucfl205','NTN UCFL 205 UCFL','ucfl-205','UCFL 205','NTN-UCFL205','cat_pillow','brand_ntn','UCFL','in_stock',203),
+  ('prod_pillow_uct205','IKO UCT 205 UCT','uct-205','UCT 205','IKO-UCT205','cat_pillow','brand_iko','UCT','available_on_order',204),
+  ('prod_pillow_ucfc205','TIMKEN UCFC 205 UCFC','ucfc-205','UCFC 205','TIMKEN-UCFC205','cat_pillow','brand_timken','UCFC','in_stock',205),
+  ('prod_pillow_ucpa205','NACHI UCPA 205 UCPA','ucpa-205','UCPA 205','NACHI-UCPA205','cat_pillow','brand_nachi','UCPA','in_stock',206),
+  ('prod_pillow_ucph205','SKF UCPH 205 UCPH','ucph-205','UCPH 205','SKF-UCPH205','cat_pillow','brand_skf','UCPH','in_stock',207),
+  ('prod_pillow_uc205','INA UC 205 Insert Bearings UC/UK/SA/SB','uc-205','UC 205','INA-UC205','cat_pillow','brand_ina','Insert Bearings UC/UK/SA/SB','available_on_order',208),
+  ('prod_linear_lm10uu','SKF LM10UU LM Series','lm10uu','LM10UU','SKF-LM10UU','cat_linear','brand_skf','LM Series','in_stock',301),
+  ('prod_linear_lme10uu','NSK LME10UU LME Series','lme10uu','LME10UU','NSK-LME10UU','cat_linear','brand_nsk','LME Series','in_stock',302),
+  ('prod_linear_lb10','NTN LB 10 Linear Bushings','lb-10','LB 10','NTN-LB10','cat_linear','brand_ntn','Linear Bushings','in_stock',303),
+  ('prod_linear_sc10uu','IKO SC10UU Linear Bearing Blocks','sc10uu','SC10UU','IKO-SC10UU','cat_linear','brand_iko','Linear Bearing Blocks','available_on_order',304),
+  ('prod_linear_hgr15','TIMKEN HGR15 Linear Guide Rails','hgr15','HGR15','TIMKEN-HGR15','cat_linear','brand_timken','Linear Guide Rails','in_stock',305),
+  ('prod_linear_hgw15cc','NACHI HGW15CC Linear Carriages','hgw15cc','HGW15CC','NACHI-HGW15CC','cat_linear','brand_nachi','Linear Carriages','in_stock',306),
+  ('prod_linear_sk10','SKF SK10 Shaft Supports','sk10','SK10','SKF-SK10','cat_linear','brand_skf','Shaft Supports','in_stock',307),
+  ('prod_housing_sn205','SKF SN 205 Plummer Blocks','sn-205','SN 205','SKF-SN205','cat_housing','brand_skf','Plummer Blocks','in_stock',401),
+  ('prod_housing_snl205','NSK SNL 205 Split Housings','snl-205','SNL 205','NSK-SNL205','cat_housing','brand_nsk','Split Housings','in_stock',402),
+  ('prod_housing_snh205','NTN SNH 205 SN/SNL Housings','snh-205','SNH 205','NTN-SNH205','cat_housing','brand_ntn','SN/SNL Housings','in_stock',403),
+  ('prod_housing_f205','IKO F 205 Flange Housings','f-205','F 205','IKO-F205','cat_housing','brand_iko','Flange Housings','available_on_order',404),
+  ('prod_housing_tu205','TIMKEN TU 205 Take-Up Housings','tu-205','TU 205','TIMKEN-TU205','cat_housing','brand_timken','Take-Up Housings','in_stock',405),
+  ('prod_housing_h205','NACHI H 205 Adapter Sleeves','h-205','H 205','NACHI-H205','cat_housing','brand_nachi','Adapter Sleeves','in_stock',406),
+  ('prod_housing_ah205','SKF AH 205 Withdrawal Sleeves','ah-205','AH 205','SKF-AH205','cat_housing','brand_skf','Withdrawal Sleeves','in_stock',407),
+  ('prod_accessory_25x47x7','SKF 25 × 47 × 7 Oil Seals','25-x-47-x-7','25 × 47 × 7','SKF-25X47X7','cat_accessories','brand_skf','Oil Seals','in_stock',501),
+  ('prod_accessory_cir25','NSK CIR-25 Circlips','cir-25','CIR-25','NSK-CIR25','cat_accessories','brand_nsk','Circlips','in_stock',502),
+  ('prod_accessory_km5','NTN KM5 Lock Nuts','km5','KM5','NTN-KM5','cat_accessories','brand_ntn','Lock Nuts','in_stock',503),
+  ('prod_accessory_mb5','IKO MB5 Lock Washers','mb5','MB5','IKO-MB5','cat_accessories','brand_iko','Lock Washers','available_on_order',504),
+  ('prod_accessory_ep2','TIMKEN EP2 Grease','ep2','EP2','TIMKEN-EP2','cat_accessories','brand_timken','Grease','in_stock',505),
+  ('prod_accessory_bph2','NACHI BPH-2 Bearing Pullers','bph-2','BPH-2','NACHI-BPH2','cat_accessories','brand_nachi','Bearing Pullers','in_stock',506),
+  ('prod_accessory_cpl24','SKF CPL-24 Couplings','cpl-24','CPL-24','SKF-CPL24','cat_accessories','brand_skf','Couplings','in_stock',507),
+  ('prod_accessory_a42','INA A-42 Belts','a-42','A-42','INA-A42','cat_accessories','brand_ina','Belts','available_on_order',508),
+  ('prod_accessory_08b','SKF 08B Chains','08b','08B','SKF-08B','cat_accessories','brand_skf','Chains','in_stock',509),
+  ('prod_accessory_12b1','NSK 12B-1 Sprockets','12b-1','12B-1','NSK-12B1','cat_accessories','brand_nsk','Sprockets','in_stock',510),
+  ('prod_accessory_o25','NTN O-25 O-Rings and related maintenance items','o-25','O-25','NTN-O25','cat_accessories','brand_ntn','O-Rings and related maintenance items','in_stock',511)
+)
+INSERT OR IGNORE INTO products (id,name,slug,bearing_number,sku,mpn,category_id,brand_id,product_type,price_visibility,stock_status,status,sort_order,seo_title,meta_description,version,created_at,updated_at,published_at)
+SELECT id,name,slug,bearing_number,sku,bearing_number,category_id,brand_id,product_type,'request',stock_status,'published',sort_order,name || ' | Bearing Mart BD','Request a quotation from Bearing Mart BD for ' || name || '.',1,datetime('now'),datetime('now'),datetime('now')
+FROM product_seed;
