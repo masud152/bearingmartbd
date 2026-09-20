@@ -7,9 +7,9 @@ export type AdminProduct = {
   width: number | null; sortOrder: number; updatedAt: string; version: number;
 };
 
-export async function listProducts(query = "") {
+export async function listProducts(query = "", categorySlug = "") {
   const pattern = `%${query.trim()}%`;
-  const result = await env.DB.prepare(`SELECT p.id,p.name,p.slug,p.bearing_number AS bearingNumber,p.sku,p.product_type AS productType,c.name AS categoryName,b.name AS brandName,p.status,p.stock_status AS stockStatus,p.bore_diameter AS boreDiameter,p.outside_diameter AS outsideDiameter,p.width,p.sort_order AS sortOrder,p.updated_at AS updatedAt,p.version FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE (?='' OR p.name LIKE ? OR p.bearing_number LIKE ? OR p.sku LIKE ?) ORDER BY p.sort_order,p.bearing_number LIMIT 100`).bind(query.trim(), pattern, pattern, pattern).all<AdminProduct>();
+  const result = await env.DB.prepare(`SELECT p.id,p.name,p.slug,p.bearing_number AS bearingNumber,p.sku,p.product_type AS productType,c.name AS categoryName,b.name AS brandName,p.status,p.stock_status AS stockStatus,p.bore_diameter AS boreDiameter,p.outside_diameter AS outsideDiameter,p.width,p.sort_order AS sortOrder,p.updated_at AS updatedAt,p.version FROM products p JOIN categories c ON c.id=p.category_id LEFT JOIN brands b ON b.id=p.brand_id WHERE (?='' OR p.name LIKE ? OR p.bearing_number LIKE ? OR p.sku LIKE ?) AND (?='' OR c.slug=?) ORDER BY c.sort_order,p.sort_order,p.bearing_number LIMIT 100`).bind(query.trim(), pattern, pattern, pattern, categorySlug, categorySlug).all<AdminProduct>();
   return result.results;
 }
 

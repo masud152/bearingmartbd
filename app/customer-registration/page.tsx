@@ -1,19 +1,4 @@
 import RegistrationForm from "./registration-form";
 import "./registration.css";
-
-export const metadata = { title: "Customer Registration | Bearing Mart BD", description: "Register as a Retail or Business customer with Bearing Mart BD." };
-
-export default function CustomerRegistration() {
-  return <main className="customer-registration-page">
-    <header className="nav">
-      <a className="brand" href="https://bearingmartbd.com/">Bearing <span>Mart BD</span></a>
-      <a href="https://bearingmartbd.com/">Return to website</a>
-    </header>
-    <section className="customer-registration-wrap">
-      <p className="eyebrow">CUSTOMER REGISTRATION</p>
-      <h1>Register with Bearing Mart BD</h1>
-      <p className="customer-intro">Choose your customer type and submit the required information. Documents are reviewed manually and are not publicly accessible.</p>
-      <RegistrationForm />
-    </section>
-  </main>;
-}
+export const metadata={title:"Customer Registration | Bearing Mart BD",description:"Register as a Retail or Business customer with Bearing Mart BD."};
+export default function CustomerRegistration(){return <main className="customer-registration-page"><header className="nav"><a className="brand" href="https://bearingmartbd.com/">Bearing <span>Mart BD</span></a><a href="https://bearingmartbd.com/">Return to website</a></header><section className="customer-registration-wrap"><p className="eyebrow">CUSTOMER REGISTRATION</p><h1>Register with Bearing Mart BD</h1><p className="customer-intro">Choose your customer type and submit the required information. Documents are reviewed manually and are not publicly accessible.</p><RegistrationForm/></section></main>}

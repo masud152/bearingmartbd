@@ -1,27 +1,11 @@
 "use client";
-
 import { useMemo, useState } from "react";
-import { categoryCatalogueImage, type CatalogueItem } from "./category-catalog-data";
+import type { CategoryProduct } from "./category-catalogue-data";
 
-const DEFAULT_CATALOGUE_IMAGE = "/catalogue-bearing-perspective.png";
-
-const stockedBrands = ["SKF", "NSK", "NTN", "KOYO/JTEKT", "TIMKEN", "NACHI"];
-const importBrands = ["FAG", "INA", "IKO"];
-
-export default function CategoryCatalogBrowser({ categorySlug, items }: { categorySlug: string; items: readonly CatalogueItem[] }) {
-  const [brand, setBrand] = useState("SKF");
-  const [model, setModel] = useState("");
-  const [type, setType] = useState("");
-  const types = [...new Set(items.map((item) => item.type))];
-  const visible = useMemo(() => items.filter((item) => (!type || item.type === type) && `${item.model} ${item.type}`.toLowerCase().includes(model.trim().toLowerCase())), [items, model, type]);
-
-  return <section className="shop-catalog">
-    <aside className="catalog-filters"><p className="eyebrow">FIND PRODUCTS</p><h2>Search catalogue.</h2>
-      <label>1. Brand<select value={brand} onChange={(event) => setBrand(event.target.value)}><optgroup label="Available now">{stockedBrands.map((name) => <option value={name} key={name}>{name}</option>)}</optgroup><optgroup label="Import on request">{importBrands.map((name) => <option value={name} key={name}>{name}</option>)}</optgroup></select></label>
-      <label>2. Model number<input value={model} onChange={(event) => setModel(event.target.value)} placeholder="Enter model or series" /></label>
-      <label>3. Product type<select value={type} onChange={(event) => setType(event.target.value)}><option value="">All product types</option>{types.map((name) => <option value={name} key={name}>{name}</option>)}</select></label>
-      <p className="filter-note">Catalogue references support product identification. Confirm the complete designation, dimensions, specification and current availability before ordering.</p>
-    </aside>
-    <div className="catalog-results"><div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Brand: {brand}</span></div><div className="shop-grid">{visible.map((item) => { const image = categoryCatalogueImage(categorySlug, item, brand); return <article className="shop-card" key={item.model}><div className="shop-bearing"><img src={image ?? DEFAULT_CATALOGUE_IMAGE} alt={image ? `Real ${brand} ${item.type} reference product` : `Representative ${item.type} catalogue image`} loading="lazy" /></div><p className="product-brand">{brand}</p><h3>{item.model}</h3><p>{item.type}</p><p>{item.summary}</p><dl><div><dt>Specification</dt><dd>Confirm</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl><a className="details-button" href={`/products/${categorySlug}/catalog/${encodeURIComponent(item.model)}?brand=${encodeURIComponent(brand)}`}>View full details →</a></article>;})}</div>{visible.length === 0 && <div className="empty-results"><h3>No matching product found.</h3><p>Try another model or type, or contact us for sourcing support.</p></div>}</div>
-  </section>;
+export default function CategoryCatalogBrowser({products,categorySlug}:{products:readonly CategoryProduct[];categorySlug:string}) {
+  const [brand,setBrand] = useState("all"),[model,setModel] = useState(""),[type,setType] = useState("all");
+  const brands = [...new Set(products.map(product => product.brand))];
+  const types = [...new Set(products.map(product => product.type))];
+  const visible = useMemo(() => products.filter(product => (brand === "all" || product.brand === brand) && (type === "all" || product.type === type) && `${product.model} ${product.type}`.toLowerCase().includes(model.toLowerCase())),[products,brand,model,type]);
+  return <section className="shop-catalog"><aside className="catalog-filters"><p className="eyebrow">FIND PRODUCTS</p><h2>Search by model<br />or brand.</h2><label>1. Brand<select value={brand} onChange={event=>setBrand(event.target.value)}><option value="all">All available brands</option>{brands.map(item=><option key={item}>{item}</option>)}</select></label><label>2. Model No.<input value={model} onChange={event=>setModel(event.target.value)} placeholder="e.g. UCP 205" /></label><label>3. Type<select value={type} onChange={event=>setType(event.target.value)}><option value="all">All product types</option>{types.map(item=><option key={item}>{item}</option>)}</select></label><p className="filter-note">Availability is shown on each item. Confirm the exact brand, size and stock before ordering.</p></aside><div className="catalog-results"><div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>{brand === "all" ? "All brands" : `Brand: ${brand}`}</span></div><div className="shop-grid">{visible.map(product=><article className="shop-card category-shop-card" key={`${product.brand}-${product.model}`}><div className="category-product-image"><img src={product.image} alt={`Representative ${product.type} product photograph`} loading="lazy" /><span>Representative product photo</span></div><p className="product-brand">{product.brand}</p><h3>{product.model}</h3><p>{product.type}</p><dl><div><dt>Availability</dt><dd>{product.availability}</dd></div><div><dt>Price</dt><dd>On request</dd></div></dl><a className="details-button" href={`/products/${categorySlug}/catalog/${product.slug}`}>View details →</a></article>)}</div>{visible.length===0&&<div className="empty-results"><h3>No matching product found.</h3><p>Try another brand, model number or type, or contact us for sourcing support.</p></div>}</div></section>;
 }

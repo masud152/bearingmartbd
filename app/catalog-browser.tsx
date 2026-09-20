@@ -1,49 +1,17 @@
 "use client";
-
 import { useMemo, useState } from "react";
-import { catalogueProductImageUrl } from "./bearing-product-images";
-import { bearingDesignation, bearingOption, brandBearingOptions, catalogueBrand } from "./brand-bearing-options";
+import { productImageUrl } from "./bearing-product-images";
+import type { BallBearingRecord } from "./managed-product-data";
 
-type Product = readonly [string, string, number, number, number, string?, string?];
+const brandOrder = ["SKF","NSK","NTN","KOYO/JTEKT","TIMKEN","NACHI","FAG","INA","IKO"];
+const availabilityLabel = { in_stock:"Normally stocked",available_on_order:"Available on order",confirm_availability:"Enquiry" } as const;
 
-const stockedBrands = ["SKF", "NSK", "NTN", "KOYO/JTEKT", "TIMKEN", "NACHI"];
-const importBrands = ["FAG", "INA", "IKO"];
-
-export default function CatalogBrowser({ products }: { products: readonly Product[] }) {
-  const [brand, setBrand] = useState("NSK");
-  const [model, setModel] = useState("");
-  const [suffix, setSuffix] = useState("");
-  const selectedBrand = catalogueBrand(brand);
-  const options = brandBearingOptions[selectedBrand];
-  const selectedSuffix = bearingOption(selectedBrand, suffix);
-  const visible = useMemo(() => {
-    const matchingBrand = products.filter(([, , , , , , productBrand = "NSK"]) => productBrand === brand);
-    return matchingBrand.filter(([number, type]) => `${number} ${type}`.toLowerCase().includes(model.trim().toLowerCase()));
-  }, [products, brand, model]);
-
-  return <section className="shop-catalog">
-    <aside className="catalog-filters">
-      <p className="eyebrow">FIND PRODUCTS</p>
-      <h2>Search bearing details.</h2>
-      <label>1. Brand<select value={brand} onChange={(event) => { setBrand(event.target.value); setSuffix(""); }}><optgroup label="Available now">{stockedBrands.map((name) => <option value={name} key={name}>{name}</option>)}</optgroup><optgroup label="Import on request">{importBrands.map((name) => <option value={name} key={name}>{name}</option>)}</optgroup></select></label>
-      <label>2. Model number<input value={model} onChange={(event) => setModel(event.target.value)} placeholder="e.g. 6200, 7000" /></label>
-      <label>3. Type / suffix<select value={suffix} onChange={(event) => setSuffix(event.target.value)}>{options.map((option) => <option value={option.value} key={option.value || "open"}>{option.label}</option>)}</select></label>
-      <div className="suffix-help" aria-live="polite"><strong>{selectedSuffix.label}</strong><span>{selectedSuffix.description}</span></div>
-      <p className="filter-note">Suffix availability depends on the model. Please confirm the complete bearing designation before ordering.</p>
-    </aside>
-    <div className="catalog-results">
-      <div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Configuration: {brand}{suffix ? ` · ${suffix}` : " · Open"}</span></div>
-      <div className="shop-grid">{visible.map(([number, type, bore, outer, width, imageKey]) => {
-        const designation = bearingDesignation(number, selectedBrand, suffix);
-        const image = catalogueProductImageUrl(imageKey);
-        return <article className="shop-card" key={number}>
-          <div className="shop-bearing"><img src={image} alt={imageKey ? `Real ${brand} ${designation} ${type} product` : `Representative ${type} catalogue image`} loading="lazy" /></div>
-          <p className="product-brand">{brand}</p><h3>{designation}</h3><p>{type}</p>
-          <dl><div><dt>Size</dt><dd>{bore} × {outer} × {width} mm</dd></div><div><dt>Suffix</dt><dd>{suffix || "Open"}</dd></div><div><dt>Availability</dt><dd>Enquiry</dd></div></dl>
-          <a className="details-button" href={`/products/ball-bearings/catalog/${number}?brand=${encodeURIComponent(brand)}${suffix ? `&suffix=${encodeURIComponent(suffix)}` : ""}`}>View full details →</a>
-        </article>;
-      })}</div>
-      {visible.length === 0 && <div className="empty-results"><h3>No published {brand} model found.</h3><p>Try another model number, choose a different brand, or contact us to confirm stock and sourcing availability.</p><a className="details-button" href={`https://wa.me/8801914528336?text=${encodeURIComponent(`Hello Bearing Mart BD, please help me find a ${brand} bearing${model ? `, model ${model}` : ""}.`)}`}>Ask about {brand} →</a></div>}
-    </div>
-  </section>;
+export default function CatalogBrowser({ products }:{ products:readonly BallBearingRecord[] }) {
+  const [query,setQuery] = useState("");
+  const [brand,setBrand] = useState("NSK");
+  const [type,setType] = useState("all");
+  const brands = brandOrder.filter(item => products.some(product => product.brand === item));
+  const types = [...new Set(products.filter(product=>product.brand===brand).map(product=>product.productType))];
+  const visible = useMemo(() => products.filter(product => product.brand === brand && (type === "all" || product.productType === type) && `${product.bearingNumber} ${product.productType} ${product.brand}`.toLowerCase().includes(query.toLowerCase())),[products,brand,query,type]);
+  return <section className="shop-catalog"><aside className="catalog-filters"><p className="eyebrow">FIND PRODUCTS</p><h2>Search by model<br />or brand.</h2><label>1. Brand<select value={brand} onChange={event => {setBrand(event.target.value);setType("all")}}>{brands.map(item => <option value={item} key={item}>{item}</option>)}</select></label><label>2. Model No.<input value={query} onChange={event => setQuery(event.target.value)} placeholder="e.g. 6200, 7000" /></label><label>3. Type<select value={type} onChange={event=>setType(event.target.value)}><option value="all">All types</option>{types.map(item=><option key={item}>{item}</option>)}</select></label><p className="filter-note">Normally stocked: SKF, NSK, NTN, KOYO/JTEKT, TIMKEN and NACHI.<br /><br />Available on order: FAG, INA and IKO.</p></aside><div className="catalog-results"><div className="catalog-results-head"><p><strong>{visible.length}</strong> products found</p><span>Brand: {brand}</span></div><div className="shop-grid">{visible.map(product => <article className="shop-card" key={product.slug}><div className="shop-bearing"><img src={productImageUrl(product.bearingNumber,product.imageKey)} alt={`${product.brand} ${product.bearingNumber} ${product.productType}`} loading="lazy" /></div><p className="product-brand">{product.brand}</p><h3>{product.bearingNumber}</h3><p>{product.productType}</p><dl><div><dt>Size</dt><dd>{product.bore} × {product.outerDiameter} × {product.width} mm</dd></div><div><dt>Availability</dt><dd>{availabilityLabel[product.stockStatus]}</dd></div></dl><a className="details-button" href={`/products/ball-bearings/catalog/${product.slug}`}>View details →</a></article>)}</div>{visible.length === 0 && <div className="empty-results"><h3>No published {brand} model found.</h3><p>Try another model number, type or brand, or contact us to confirm stock and sourcing availability.</p></div>}</div></section>;
 }
