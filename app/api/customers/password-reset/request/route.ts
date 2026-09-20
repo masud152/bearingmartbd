@@ -1,10 +1,12 @@
 import { env } from "cloudflare:workers";
 import { canonicalEmail, createSecureToken, tokenHash } from "../../../../customer-auth";
 import { passwordResetLink, sendPasswordResetEmail } from "../../../../password-reset-email";
+import { customerPasswordResetEnabled } from "../../../../customer-password-reset/availability";
 
 const neutral = () => Response.json({ ok: true, message: "If an account matches that email address, password reset instructions will be sent shortly." }, { headers: { "cache-control": "no-store" } });
 
 export async function POST(request: Request) {
+  if (!customerPasswordResetEnabled) return new Response(null, { status: 404 });
   let body: { email?: unknown };
   try { body = await request.json(); } catch { return neutral(); }
   const email = canonicalEmail(body.email);

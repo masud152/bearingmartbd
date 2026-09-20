@@ -1,9 +1,11 @@
 import { env } from "cloudflare:workers";
 import { hashPassword, tokenHash, validatePassword } from "../../../../customer-auth";
+import { customerPasswordResetEnabled } from "../../../../customer-password-reset/availability";
 
 const invalid = () => Response.json({ error: "This password reset link is invalid, expired, or has already been used." }, { status: 400, headers: { "cache-control": "no-store" } });
 
 export async function POST(request: Request) {
+  if (!customerPasswordResetEnabled) return new Response(null, { status: 404 });
   let body: { token?: unknown; password?: unknown; confirmPassword?: unknown };
   try { body = await request.json(); } catch { return invalid(); }
   const token = typeof body.token === "string" ? body.token : "";
