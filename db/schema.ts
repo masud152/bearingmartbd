@@ -142,15 +142,6 @@ export const customerSessions = sqliteTable("customer_sessions", {
   createdAt: text("created_at").notNull(),
 });
 
-export const customerPasswordResets = sqliteTable("customer_password_resets", {
-  id: text("id").primaryKey(),
-  customerId: text("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
-  tokenHash: text("token_hash"),
-  expiresAt: text("expires_at"),
-  usedAt: text("used_at"),
-  createdAt: text("created_at").notNull(),
-});
-
 export const auditEvents = sqliteTable("audit_events", {
   id: text("id").primaryKey(),
   actorId: text("actor_id"),

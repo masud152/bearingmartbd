@@ -52,13 +52,6 @@
       "breakpoints": true
     },
     {
-      "idx": 7,
-      "version": "7",
-      "when": 1787918400000,
-      "tag": "0007_customer_password_resets",
-      "breakpoints": true
-    },
-    {
       "idx": 8,
       "version": "7",
       "when": 1787922000000,
