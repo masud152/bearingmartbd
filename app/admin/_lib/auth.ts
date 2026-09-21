@@ -1,46 +1,22 @@
-import { env } from "cloudflare:workers";
+import "server-only";
+import { createHmac } from "node:crypto";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getChatGPTUser, type ChatGPTUser } from "../../chatgpt-auth";
+import { env } from "@/lib/server/runtime";
 
-export type AdminIdentity = ChatGPTUser & { permissions: Set<string>; bootstrap: boolean };
+export type AdminIdentity = { userId: string; displayName: string; email: string; fullName: string | null; permissions: Set<string>; bootstrap: boolean };
+export const ADMIN_SESSION_COOKIE = "bmb_admin_session";
 
-function bootstrapEmails() {
-  const value = (env as unknown as { ADMIN_EMAILS?: string }).ADMIN_EMAILS ?? "";
-  return new Set(value.split(",").map((email) => email.trim().toLowerCase()).filter(Boolean));
-}
+function secret() { const value = process.env.SESSION_SECRET; if (!value) throw new Error("SESSION_SECRET is required for administrator sessions."); return value; }
+export function adminSessionHash(raw: string) { return createHmac("sha256", secret()).update(raw).digest("hex"); }
 
 export async function getAdminIdentity(): Promise<AdminIdentity | null> {
-  const user = await getChatGPTUser();
-  if (!user) return null;
-  if (bootstrapEmails().has(user.email.toLowerCase())) {
-    return { ...user, permissions: new Set(["*"]), bootstrap: true };
-  }
-  try {
-    const record = await env.DB.prepare("SELECT id, status FROM admin_users WHERE lower(email) = lower(?)").bind(user.email).first<{ id: string; status: string }>();
-    if (!record || record.status !== "active") return null;
-    const result = await env.DB.prepare("SELECT rp.permission_key AS permissionKey FROM user_roles ur JOIN role_permissions rp ON rp.role_id = ur.role_id WHERE ur.user_id = ?").bind(record.id).all<{ permissionKey: string }>();
-    return { ...user, userId: record.id, permissions: new Set(result.results.map((row) => row.permissionKey)), bootstrap: false };
-  } catch {
-    return null;
-  }
+  const raw = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value; if (!raw) return null;
+  const record = await env.DB.prepare(`SELECT u.id,u.email,u.display_name AS displayName FROM admin_sessions s JOIN admin_users u ON u.id=s.admin_user_id WHERE s.id=? AND s.expires_at>? AND u.status='active'`).bind(adminSessionHash(raw), new Date().toISOString()).first<{id:string;email:string;displayName:string|null}>();
+  if (!record) return null;
+  const permissions = await env.DB.prepare("SELECT rp.permission_key AS permissionKey FROM user_roles ur JOIN role_permissions rp ON rp.role_id=ur.role_id WHERE ur.user_id=?").bind(record.id).all<{permissionKey:string}>();
+  return { userId: record.id, email: record.email, displayName: record.displayName ?? record.email, fullName: record.displayName, permissions: new Set(permissions.results.map((row) => row.permissionKey)), bootstrap: false };
 }
-
-export async function requireAdmin(permission: string, returnTo = "/admin") {
-  const user = await getChatGPTUser();
-  if (!user) redirect(`/signin-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`);
-  const identity = await getAdminIdentity();
-  if (!identity) redirect("/admin-access-denied");
-  if (!identity.permissions.has("*") && !identity.permissions.has(permission)) redirect("/admin-access-denied");
-  return identity;
-}
-
-export async function authorizeApi(permission: string) {
-  const identity = await getAdminIdentity();
-  if (!identity) return { response: Response.json({ error: "Authentication or admin access required." }, { status: 401 }) } as const;
-  if (!identity.permissions.has("*") && !identity.permissions.has(permission)) return { response: Response.json({ error: "You do not have permission for this action." }, { status: 403 }) } as const;
-  return { identity } as const;
-}
-
-export function can(identity: AdminIdentity, permission: string) {
-  return identity.permissions.has("*") || identity.permissions.has(permission);
-}
+export async function requireAdmin(permission: string, returnTo = "/admin") { const identity = await getAdminIdentity(); if (!identity) redirect(`/admin-login?return_to=${encodeURIComponent(returnTo)}`); if (!identity.permissions.has("*") && !identity.permissions.has(permission)) redirect("/admin-access-denied"); return identity; }
+export async function authorizeApi(permission: string) { const identity = await getAdminIdentity(); if (!identity) return { response: Response.json({ error: "Authentication or admin access required." }, { status: 401 }) } as const; if (!identity.permissions.has("*") && !identity.permissions.has(permission)) return { response: Response.json({ error: "You do not have permission for this action." }, { status: 403 }) } as const; return { identity } as const; }
+export function can(identity: AdminIdentity, permission: string) { return identity.permissions.has("*") || identity.permissions.has(permission); }

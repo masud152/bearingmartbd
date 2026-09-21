@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/server/runtime";
 
 export type AdminProduct = {
   id: string; name: string; slug: string; bearingNumber: string; sku: string | null;

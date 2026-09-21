@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/server/runtime";
 import { createCustomerSession,sessionCookie,verifyPassword } from "../../../customer-auth";
 const normalize=(value:unknown)=>typeof value==="string"?value.trim().slice(0,180):"";
 const dummyHash="pbkdf2_sha256$210000$MDEyMzQ1Njc4OWFiY2RlZg==$Y7h1hBgeXZuQWfG9NBOCv7TdZc2XK0CYmYJpNfYq2lM=";

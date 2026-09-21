@@ -1,15 +1,7 @@
-import { env } from "cloudflare:workers";
-
-const tableSql = `CREATE TABLE IF NOT EXISTS site_stats (
-  key TEXT PRIMARY KEY,
-  value INTEGER NOT NULL DEFAULT 0
-)`;
+import { env } from "@/lib/server/runtime";
 
 async function ensureCounter() {
-  await env.DB.batch([
-    env.DB.prepare(tableSql),
-    env.DB.prepare("INSERT OR IGNORE INTO site_stats (key, value) VALUES ('global_hits', 0)"),
-  ]);
+  await env.DB.prepare("INSERT IGNORE INTO site_stats (`key`, value) VALUES ('global_hits', 0)").run();
 }
 
 export async function GET() {

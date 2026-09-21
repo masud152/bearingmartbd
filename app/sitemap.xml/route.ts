@@ -1,4 +1,8 @@
-import { env } from "cloudflare:workers";
+import { env } from "@/lib/server/runtime";
+
+// Published product URLs come from MySQL at request time; never require a
+// database connection while building the cPanel deployment artifact.
+export const dynamic = "force-dynamic";
 
 const origin = "https://bearingmartbd.com";
 const escape = (value: string) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
