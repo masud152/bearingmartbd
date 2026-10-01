@@ -19,8 +19,8 @@ export default async function CustomerProfilePage() {
 
   return <main className="customer-account-page">
     <header className="nav">
-      <a className="brand" href="https://bearingmartbd.com/">Bearing <span>Mart BD</span></a>
-      <a href="https://bearingmartbd.com/products/ball-bearings/catalog">Browse products</a>
+      <a className="brand" href="/">Bearing <span>Mart BD</span></a>
+      <a href="/products/ball-bearings/catalog">Browse products</a>
     </header>
     <section className="customer-account-wrap">
       <p className="eyebrow">CUSTOMER PROFILE</p>
@@ -36,7 +36,7 @@ export default async function CustomerProfilePage() {
           <p>Keep your contact and business details up to date.</p>
           <ProfileForm profile={customer} />
           <div className="account-actions">
-            <a className="button primary" href="https://bearingmartbd.com/products/ball-bearings/catalog">Browse products</a>
+            <a className="button primary" href="/products/ball-bearings/catalog">Browse products</a>
             <LogoutButton />
           </div>
         </div>

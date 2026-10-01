@@ -1,6 +1,6 @@
 import "server-only";
 import { createReadStream, createWriteStream } from "node:fs";
-import { access, mkdir } from "node:fs/promises";
+import { access, mkdir, unlink } from "node:fs/promises";
 import { dirname, extname, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
@@ -8,6 +8,7 @@ import { Readable } from "node:stream";
 export type MediaStorage = {
   put(key: string, body: ReadableStream, options?: { httpMetadata?: { contentType?: string } }): Promise<void>;
   get(key: string): Promise<{ body: ReadableStream; httpMetadata: { contentType: string }; writeHttpMetadata(headers: Headers): void; httpEtag: string } | null>;
+  delete(key: string): Promise<void>;
 };
 
 function mediaRoot() {
@@ -46,4 +47,4 @@ export const mediaStorage: MediaStorage = {
       writeHttpMetadata(headers) { headers.set("content-type", type); },
     };
   },
-};
+  async delete(key) {    try { await unlink(safePath(key)); } catch (error) { if (!(error instanceof Error) || !("code" in error) || error.code !== "ENOENT") throw error; }  },};

@@ -11,7 +11,7 @@ export default function RegistrationForm() {
   useEffect(() => {
     if (!complete) return;
     const countdown = window.setInterval(() => setSeconds(value => Math.max(0, value - 1)), 1000);
-    const redirect = window.setTimeout(() => window.location.assign("https://bearingmartbd.com/"), 5000);
+    const redirect = window.setTimeout(() => window.location.assign("/"), 5000);
     return () => { window.clearInterval(countdown); window.clearTimeout(redirect); };
   }, [complete]);
 

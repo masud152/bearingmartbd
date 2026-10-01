@@ -7,7 +7,7 @@ async function ensureCounter() {
 export async function GET() {
   await ensureCounter();
   const result = await env.DB
-    .prepare("SELECT value FROM site_stats WHERE key = 'global_hits'")
+    .prepare("SELECT value FROM site_stats WHERE `key` = 'global_hits'")
     .first<{ value: number }>();
   return Response.json({ hits: result?.value ?? 0 });
 }
@@ -15,10 +15,10 @@ export async function GET() {
 export async function POST() {
   await ensureCounter();
   await env.DB
-    .prepare("UPDATE site_stats SET value = value + 1 WHERE key = 'global_hits'")
+    .prepare("UPDATE site_stats SET value = value + 1 WHERE `key` = 'global_hits'")
     .run();
   const result = await env.DB
-    .prepare("SELECT value FROM site_stats WHERE key = 'global_hits'")
+    .prepare("SELECT value FROM site_stats WHERE `key` = 'global_hits'")
     .first<{ value: number }>();
   return Response.json({ hits: result?.value ?? 0 });
 }

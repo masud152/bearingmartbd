@@ -34,7 +34,7 @@ try {
   }
   const roleId = "super-admin";
   await connection.execute("INSERT IGNORE INTO roles (id, name, description, is_system, created_at, updated_at) VALUES (?, 'Super administrator', 'Full administrative access', TRUE, ?, ?)", [roleId, now, now]);
-  const permissions = ["admin.access", "products.read", "products.create", "products.update", "products.delete", "customers.read", "customers.update", "users.read", "users.create", "users.update", "roles.read", "roles.update", "audit.read"];
+  const permissions = ["admin.access", "dashboard.view", "products.read", "products.view", "products.create", "products.update", "products.delete", "customers.read", "customers.view", "customers.update", "users.read", "users.view", "users.create", "users.update", "roles.read", "roles.view", "roles.update", "audit.read", "audit.view"];
   for (const key of permissions) {
     await connection.execute("INSERT IGNORE INTO permissions (`key`, description) VALUES (?, ?)", [key, `Bootstrap permission: ${key}`]);
     await connection.execute("INSERT IGNORE INTO role_permissions (role_id, permission_key) VALUES (?, ?)", [roleId, key]);
