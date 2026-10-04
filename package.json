@@ -16,7 +16,8 @@
     "db:check": "node scripts/check-mysql-schema.mjs",
     "admin:bootstrap": "node scripts/bootstrap-admin.mjs",
     "import:d1": "node scripts/import-d1-json.mjs",
-    "import:r2": "node scripts/import-r2-files.mjs"
+    "import:r2": "node scripts/import-r2-files.mjs",
+    "import:ball-bearings": "node scripts/import-ball-bearing-csv.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.2",

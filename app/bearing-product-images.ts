@@ -13,8 +13,10 @@ const IMAGE_BY_BEARING: Record<string, string> = {
   "7300": "/bearing-products/nsk-angular-contact.jpg", "7403": "/bearing-products/nsk-angular-contact.jpg",
 };
 
-export function productImageUrl(bearingNumber: string, imageKey?: string | null) {
-  return imageKey ? `/api/product-images/${imageKey}` : IMAGE_BY_BEARING[bearingNumber] ?? "/bearing-products/nsk-deep-groove.jpg";
+export function productImageUrl(bearingNumber: string, imageKey?: string | null, brand = "NSK") {
+  if (imageKey) return `/api/product-images/${imageKey}`;
+  // Legacy images are genuine NSK references and must never label another maker's product.
+  return brand === "NSK" ? IMAGE_BY_BEARING[bearingNumber] ?? "/bearing-products/nsk-deep-groove.jpg" : "/bearing-products/bearingmart-neutral-ball-bearing.svg";
 }
 
 export const PRODUCT_IMAGE_NOTE = "Representative NSK product image. Seal, cage and suffix configuration may vary.";
