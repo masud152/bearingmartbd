@@ -7,6 +7,11 @@ import { categoryCatalogues } from "../../category-catalogue-data";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
+// Ball-bearing records are managed in MySQL and may be published after the
+// application build. Render this route at request time so catalogue and
+// filter results cannot become stale until the next deployment.
+export const dynamic = "force-dynamic";
+
 const brands = {
   stocked: ["SKF", "NSK", "NTN", "KOYO/JTEKT", "TIMKEN", "NACHI"],
   onOrder: ["SKF", "FAG", "INA", "NSK", "NTN", "KOYO/JTEKT", "TIMKEN", "NACHI", "IKO"],
