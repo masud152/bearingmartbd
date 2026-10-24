@@ -14,11 +14,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate-mysql.mjs",
     "db:check": "node scripts/check-mysql-schema.mjs",
+    "release-a:preflight": "node scripts/release-a-catalogue-migrate.mjs",
+    "release-a:migrate": "node scripts/release-a-catalogue-migrate.mjs --apply",
+    "release-a:seed": "node scripts/release-a-catalogue-seed.mjs --apply",
     "admin:bootstrap": "node scripts/bootstrap-admin.mjs",
     "import:d1": "node scripts/import-d1-json.mjs",
-    "import:r2": "node scripts/import-r2-files.mjs",
-    "import:ball-bearings": "node scripts/import-ball-bearing-csv.mjs",
-    "import:manufacturer-master": "node scripts/import-manufacturer-master-csv.mjs"
+    "import:r2": "node scripts/import-r2-files.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.2",

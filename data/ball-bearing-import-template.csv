@@ -1,2 +1,0 @@
-brand,category,bearing_type,series,basic_model,manufacturer_designation,sku,bore_mm,od_mm,width_mm,seal_shield,clearance,cage,dynamic_load_value,dynamic_load_unit,static_load_value,static_load_unit,speed_rpm,speed_note,availability,published,source_url,source_title,source_verified_at,image_path
-NSK,ball-bearings,Deep Groove Ball Bearing,6200 Series,6201,6201ZZ,NSK-6201ZZ,12,32,10,Shield on both sides,CN / Normal,Pressed steel cage,7500,N,3050,N,26000,grease lubrication,confirm_availability,no,https://www.nsk.com/,NSK official product data,2026-10-05,
