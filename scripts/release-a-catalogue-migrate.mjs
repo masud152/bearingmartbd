@@ -1,6 +1,8 @@
 import { createPool } from "mysql2/promise";
+import { columnDiagnostics, indexDiagnostics } from "./release-a-schema-inspection.mjs";
 
 const apply = process.argv.includes("--apply");
+const diagnoseOnly = process.argv.includes("--diagnose-only");
 const reconcileLedger = process.argv.includes("--reconcile-ledger");
 const required = (name) => {
   const value = process.env[name];
@@ -11,7 +13,8 @@ const required = (name) => {
 if (apply && process.env.APP_ENV === "production" && process.env.RELEASE_A_PRODUCTION_CONFIRM !== "apply-release-a-catalogue") {
   throw new Error("Production application requires RELEASE_A_PRODUCTION_CONFIRM=apply-release-a-catalogue.");
 }
-if (reconcileLedger && !apply) throw new Error("--reconcile-ledger requires --apply.");
+if (reconcileLedger && (!apply || diagnoseOnly)) throw new Error("--reconcile-ledger requires --apply without --diagnose-only.");
+if (apply && diagnoseOnly) throw new Error("--apply and --diagnose-only cannot be combined.");
 
 const pool = createPool({ host: required("DB_HOST"), port: Number(process.env.DB_PORT || 3306), user: required("DB_USER"), password: required("DB_PASSWORD"), database: required("DB_NAME"), charset: "utf8mb4" });
 const connection = await pool.getConnection();
@@ -63,13 +66,17 @@ function assertSafeState(label, columnState, indexState, ledgerPresent) {
   if (ledgerPresent && (columnState !== "complete" || indexState !== "complete")) throw new Error(`${label} is recorded in schema_migrations but its schema definition does not match.`);
   if (!ledgerPresent && (columnState === "complete" || indexState === "complete") && !reconcileLedger) throw new Error(`${label} schema exists without its migration-ledger entry. Re-run only after manual review with --apply --reconcile-ledger.`);
 }
-async function state() {
+async function state({ enforce = true } = {}) {
   const [columns, indexes, ledger] = await Promise.all([productColumns(), productIndexes(), migrationLedger()]);
-  const first = { columns: inspectColumns(columns, columns0002), indexes: inspectIndexes(indexes, indexes0002), ledger: ledger.has(releaseA0002) };
-  const second = { columns: inspectColumns(columns, columns0003), indexes: inspectIndexes(indexes, indexes0003), ledger: ledger.has(releaseA0003) };
-  assertSafeState(releaseA0002, first.columns, first.indexes, first.ledger);
-  assertSafeState(releaseA0003, second.columns, second.indexes, second.ledger);
-  if ((second.columns !== "absent" || second.indexes !== "absent") && first.columns !== "complete") throw new Error("0003 schema cannot exist before a complete 0002 schema.");
+  const firstColumnDiagnostics = columnDiagnostics(columns, columns0002), firstIndexDiagnostics = indexDiagnostics(indexes, indexes0002);
+  const secondColumnDiagnostics = columnDiagnostics(columns, columns0003), secondIndexDiagnostics = indexDiagnostics(indexes, indexes0003);
+  const first = { columns: firstColumnDiagnostics.state, indexes: firstIndexDiagnostics.state, ledger: ledger.has(releaseA0002), diagnostics: { columns: firstColumnDiagnostics.items, indexes: firstIndexDiagnostics.items } };
+  const second = { columns: secondColumnDiagnostics.state, indexes: secondIndexDiagnostics.state, ledger: ledger.has(releaseA0003), diagnostics: { columns: secondColumnDiagnostics.items, indexes: secondIndexDiagnostics.items } };
+  if (enforce) {
+    assertSafeState(releaseA0002, first.columns, first.indexes, first.ledger);
+    assertSafeState(releaseA0003, second.columns, second.indexes, second.ledger);
+    if ((second.columns !== "absent" || second.indexes !== "absent") && first.columns !== "complete") throw new Error("0003 schema cannot exist before a complete 0002 schema.");
+  }
   return { first, second };
 }
 async function mark(filename) { await connection.execute("INSERT INTO schema_migrations (filename,applied_at) VALUES (?,?)", [filename, new Date().toISOString()]); }
@@ -78,9 +85,9 @@ async function verifyComplete() {
   if (current.first.columns !== "complete" || current.first.indexes !== "complete" || current.second.columns !== "complete" || current.second.indexes !== "complete") throw new Error("Post-migration verification failed.");
 }
 try {
-  const before = await state();
-  console.log(JSON.stringify({ database: process.env.DB_NAME, apply, before }, null, 2));
-  if (!apply) process.exitCode = 0;
+  const before = await state({ enforce: !diagnoseOnly });
+  console.log(JSON.stringify({ database: process.env.DB_NAME, apply, diagnoseOnly, before }, null, 2));
+  if (diagnoseOnly || !apply) process.exitCode = 0;
   else {
     if (!before.first.ledger) {
       if (before.first.columns !== "absent" || before.first.indexes !== "absent") {
