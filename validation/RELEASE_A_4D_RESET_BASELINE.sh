@@ -105,7 +105,7 @@ IFS=$'\t' read -r ORIGINAL_CHARACTER_SET ORIGINAL_COLLATION <<< "$DATABASE_DEFAU
 [[ "$ORIGINAL_COLLATION" =~ ^[A-Za-z0-9_]+$ ]] || die "unexpected original collation"
 pre_destructive_state
 
-printf 'RECOVERY_PREFLIGHT_PASS database=%s commit=%s\n' "$DB_NAME_REQUIRED" "$EXPECTED_COMMIT"
+printf 'RECOVERY_PREFLIGHT_PASS database=%s character_set=%s collation=%s commit=%s\n' "$DB_NAME_REQUIRED" "$ORIGINAL_CHARACTER_SET" "$ORIGINAL_COLLATION" "$EXPECTED_COMMIT"
 
 if test "$APPLY" != "--apply"; then
   printf 'RESET_NOT_APPLIED: rerun only after approval with --apply and RELEASE_A_4D_CONFIRM=reset-bearingmartbd-release-a-test\n'
