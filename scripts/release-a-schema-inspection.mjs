@@ -2,6 +2,34 @@
  * Pure schema-metadata comparison helpers for the Release A catalogue migrations.
  * These do not open a database connection or change schema state.
  */
+function metadataValue(row, lowercaseName, uppercaseName) {
+  if (Object.hasOwn(row, lowercaseName)) return row[lowercaseName];
+  if (Object.hasOwn(row, uppercaseName)) return row[uppercaseName];
+  throw new Error(`MySQL metadata row is missing ${lowercaseName}/${uppercaseName}.`);
+}
+
+/** Normalize a mysql2 INFORMATION_SCHEMA.COLUMNS row without relaxing validation. */
+export function normalizeColumnMetadata(row) {
+  return [
+    metadataValue(row, "column_name", "COLUMN_NAME"),
+    {
+      type: String(metadataValue(row, "column_type", "COLUMN_TYPE")).toLowerCase(),
+      nullable: metadataValue(row, "is_nullable", "IS_NULLABLE"),
+      defaultValue: metadataValue(row, "column_default", "COLUMN_DEFAULT"),
+    },
+  ];
+}
+
+/** Normalize a mysql2 INFORMATION_SCHEMA.STATISTICS row without relaxing validation. */
+export function normalizeIndexMetadata(row) {
+  return {
+    name: metadataValue(row, "index_name", "INDEX_NAME"),
+    nonUnique: metadataValue(row, "non_unique", "NON_UNIQUE"),
+    sequence: metadataValue(row, "seq_in_index", "SEQ_IN_INDEX"),
+    columnName: metadataValue(row, "column_name", "COLUMN_NAME"),
+  };
+}
+
 export function columnDiagnostics(columns, expected) {
   const items = expected.map(([name, type, nullable, defaultValue]) => {
     const actual = columns.get(name);

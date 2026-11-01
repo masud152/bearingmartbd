@@ -1,5 +1,5 @@
 import { createPool } from "mysql2/promise";
-import { columnDiagnostics, indexDiagnostics } from "./release-a-schema-inspection.mjs";
+import { columnDiagnostics, indexDiagnostics, normalizeColumnMetadata, normalizeIndexMetadata } from "./release-a-schema-inspection.mjs";
 
 const apply = process.argv.includes("--apply");
 const diagnoseOnly = process.argv.includes("--diagnose-only");
@@ -33,16 +33,16 @@ async function migrationLedger() {
   return new Set(rows.map((row) => row.filename));
 }
 async function productColumns() {
-  const [rows] = await connection.query("SELECT column_name,column_type,is_nullable,column_default FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='products'");
-  return new Map(rows.map((row) => [row.column_name, { type: String(row.column_type).toLowerCase(), nullable: row.is_nullable, defaultValue: row.column_default }]));
+  const [rows] = await connection.query("SELECT COLUMN_NAME AS column_name,COLUMN_TYPE AS column_type,IS_NULLABLE AS is_nullable,COLUMN_DEFAULT AS column_default FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='products'");
+  return new Map(rows.map(normalizeColumnMetadata));
 }
 async function productIndexes() {
-  const [rows] = await connection.query("SELECT index_name,non_unique,seq_in_index,column_name FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='products' ORDER BY index_name,seq_in_index");
+  const [rows] = await connection.query("SELECT INDEX_NAME AS index_name,NON_UNIQUE AS non_unique,SEQ_IN_INDEX AS seq_in_index,COLUMN_NAME AS column_name FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='products' ORDER BY index_name,seq_in_index");
   const indexes = new Map();
-  for (const row of rows) {
-    const value = indexes.get(row.index_name) ?? { unique: Number(row.non_unique) === 0, columns: [] };
-    value.columns.push(row.column_name);
-    indexes.set(row.index_name, value);
+  for (const row of rows.map(normalizeIndexMetadata)) {
+    const value = indexes.get(row.name) ?? { unique: Number(row.nonUnique) === 0, columns: [] };
+    value.columns.push(row.columnName);
+    indexes.set(row.name, value);
   }
   return indexes;
 }

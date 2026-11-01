@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { columnDiagnostics, indexDiagnostics } from "../scripts/release-a-schema-inspection.mjs";
+import { columnDiagnostics, indexDiagnostics, normalizeColumnMetadata, normalizeIndexMetadata } from "../scripts/release-a-schema-inspection.mjs";
 
 const expectedColumns = [
   ["series", "varchar(120)", "YES", null],
@@ -26,6 +26,36 @@ test("column diagnostics report a complete MySQL schema and normalize NULL defau
   assert.equal(diagnostic.state, "complete");
   assert.equal(diagnostic.items[0].actual.defaultValue, "");
   assert.deepEqual(diagnostic.items.map((item) => item.result), ["match", "match"]);
+});
+
+test("mysql2 INFORMATION_SCHEMA rows are normalized with uppercase or explicit lowercase keys", () => {
+  assert.deepEqual(
+    normalizeColumnMetadata({ COLUMN_NAME: "series", COLUMN_TYPE: "varchar(120)", IS_NULLABLE: "YES", COLUMN_DEFAULT: null }),
+    ["series", { type: "varchar(120)", nullable: "YES", defaultValue: null }],
+  );
+  assert.deepEqual(
+    normalizeColumnMetadata({ column_name: "source_document", column_type: "varchar(255)", is_nullable: "YES", column_default: null }),
+    ["source_document", { type: "varchar(255)", nullable: "YES", defaultValue: null }],
+  );
+  assert.deepEqual(
+    normalizeIndexMetadata({ INDEX_NAME: "products_brand_designation_unique", NON_UNIQUE: 0, SEQ_IN_INDEX: 2, COLUMN_NAME: "normalized_manufacturer_designation" }),
+    { name: "products_brand_designation_unique", nonUnique: 0, sequence: 2, columnName: "normalized_manufacturer_designation" },
+  );
+  assert.deepEqual(
+    normalizeIndexMetadata({ index_name: "products_basic_model_idx", non_unique: 1, seq_in_index: 1, column_name: "basic_model" }),
+    { name: "products_basic_model_idx", nonUnique: 1, sequence: 1, columnName: "basic_model" },
+  );
+});
+
+test("mysql2 metadata rows fail closed when a required field is absent", () => {
+  assert.throws(
+    () => normalizeColumnMetadata({ COLUMN_NAME: "series", COLUMN_TYPE: "varchar(120)", IS_NULLABLE: "YES" }),
+    /column_default\/COLUMN_DEFAULT/,
+  );
+  assert.throws(
+    () => normalizeIndexMetadata({ INDEX_NAME: "products_basic_model_idx", NON_UNIQUE: 1, SEQ_IN_INDEX: 1 }),
+    /column_name\/COLUMN_NAME/,
+  );
 });
 
 test("column diagnostics distinguish absent, partial, and incompatible metadata", () => {
@@ -54,4 +84,6 @@ test("diagnose-only mode bypasses fail-closed state enforcement but cannot combi
   assert.match(source, /state\(\{ enforce: !diagnoseOnly \}\)/);
   assert.match(source, /--apply and --diagnose-only cannot be combined/);
   assert.match(source, /--reconcile-ledger requires --apply without --diagnose-only/);
+  assert.match(source, /COLUMN_NAME AS column_name/);
+  assert.match(source, /INDEX_NAME AS index_name/);
 });
