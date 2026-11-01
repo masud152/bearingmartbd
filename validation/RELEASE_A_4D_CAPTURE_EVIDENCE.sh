@@ -64,8 +64,22 @@ chmod 700 "$EVIDENCE_ROOT" "$OUT_DIR"
   MYSQL_PWD="$DB_PASSWORD" "${MYSQL_TEST[@]}" -e "SELECT (SELECT COUNT(*) FROM products) AS products,(SELECT COUNT(*) FROM brands) AS brands,(SELECT COUNT(*) FROM categories) AS categories;"
 } > "$OUT_DIR/inspection.txt"
 
-MYSQL_PWD="$DB_PASSWORD" mysqldump --protocol=TCP -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --skip-lock-tables --skip-triggers --no-data "$DB_NAME" > "$OUT_DIR/schema.sql"
+SCHEMA_TMP="$OUT_DIR/schema.sql.tmp"
+DUMP_STDERR="$OUT_DIR/mysqldump.stderr.tmp"
+if ! MYSQL_PWD="$DB_PASSWORD" mysqldump --protocol=TCP -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --skip-lock-tables --skip-triggers --no-tablespaces --no-data "$DB_NAME" > "$SCHEMA_TMP" 2> "$DUMP_STDERR"; then
+  rm -f "$SCHEMA_TMP" "$DUMP_STDERR"
+  die "mysqldump failed; evidence capture is incomplete"
+fi
+test -s "$SCHEMA_TMP" || { rm -f "$SCHEMA_TMP" "$DUMP_STDERR"; die "mysqldump produced an empty schema snapshot"; }
+if grep -qi 'access denied' "$DUMP_STDERR"; then
+  rm -f "$SCHEMA_TMP" "$DUMP_STDERR"
+  die "mysqldump reported an access-denied error; evidence capture is incomplete"
+fi
+mv "$SCHEMA_TMP" "$OUT_DIR/schema.sql"
+rm -f "$DUMP_STDERR"
+
 sha256sum "$OUT_DIR/inspection.txt" "$OUT_DIR/schema.sql" > "$OUT_DIR/SHA256SUMS"
+(cd "$OUT_DIR" && sha256sum -c SHA256SUMS) || die "evidence checksum verification failed"
 chmod 600 "$OUT_DIR/inspection.txt" "$OUT_DIR/schema.sql" "$OUT_DIR/SHA256SUMS"
 
 printf 'EVIDENCE_CAPTURED=%s\n' "$OUT_DIR"
