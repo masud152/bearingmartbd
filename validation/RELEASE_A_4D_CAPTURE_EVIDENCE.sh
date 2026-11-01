@@ -50,6 +50,8 @@ chmod 700 "$EVIDENCE_ROOT" "$OUT_DIR"
   printf 'baseline_sha256=%s\n' "$EXPECTED_SQL_SHA"
   printf 'database=%s\n' "$SELECTED_DB"
   printf 'current_user=%s\n' "$EFFECTIVE_USER"
+  printf '\n[database_defaults]\n'
+  MYSQL_PWD="$DB_PASSWORD" "${MYSQL_TEST[@]}" -e "SELECT DEFAULT_CHARACTER_SET_NAME,DEFAULT_COLLATION_NAME FROM information_schema.schemata WHERE schema_name=DATABASE();"
   printf '\n[migration_ledger]\n'
   MYSQL_PWD="$DB_PASSWORD" "${MYSQL_TEST[@]}" -e "SELECT filename,applied_at FROM schema_migrations ORDER BY filename;"
   printf '\n[table_inventory]\n'
